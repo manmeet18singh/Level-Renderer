@@ -10,6 +10,7 @@
 // TODO: Part 2a
 // TODO: Part 4a
 // With what we want & what we don't defined we can include the API
+#define GATEWARE_ENABLE_MATH 
 #include "Gateware/Gateware.h"
 #include "renderer.h"
 // open some namespaces to compact the code a bit

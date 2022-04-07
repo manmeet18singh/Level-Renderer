@@ -1,5 +1,6 @@
 // minimalistic code to draw a single triangle, this is not part of the API.
 #include "shaderc/shaderc.h" // needed for compiling shaders at runtime
+#include <vector>
 #ifdef _WIN32 // must use MT platform DLL libraries on windows
 	#pragma comment(lib, "shaderc_combined.lib") 
 #endif
@@ -9,11 +10,24 @@ const char* vertexShaderSource = R"(
 // TODO: Part 2b
 // TODO: Part 2f, Part 3b
 // TODO: Part 1c
-float4 main(float2 inputVertex : POSITION) : SV_POSITION
+
+struct VS_INPUT
+{
+    float4 Pos : POSITION;
+};
+
+struct PS_INPUT
+{
+    float4 Pos : SV_POSITION;
+};
+
+PS_INPUT main(VS_INPUT input)
 {
 	// TODO: Part 2d
 	// TODO: Part 2f, Part 3b
-	return float4(inputVertex, 0, 1);
+	PS_INPUT output = (PS_INPUT) 0;
+	output.Pos = input.Pos;
+	return output;
 }
 )";
 // Simple Pixel Shader
@@ -47,7 +61,59 @@ class Renderer
 	VkPipelineLayout pipelineLayout = nullptr;
 public:
 	// TODO: Part 1c
-	struct Vertex { float x, y, z, w; };
+
+	//struct ColorVertex 
+	//{
+	//	GW::MATH::GVECTORF pos;
+	//	GW::MATH::GVECTORF clr;
+	//};
+	
+	struct Vertex { float x, y, z, w;  };
+
+	std::vector<Vertex> vertexList;
+
+	//void AddLine(GW::MATH::GVECTORF pos1, GW::MATH::GVECTORF pos2, GW::MATH::GVECTORF color)
+	//{
+	//	vertexList.push_back({ pos1, color });
+	//	vertexList.push_back({ pos2, color });
+	//}
+
+	void AddLine(Vertex pos1, Vertex pos2)
+	{
+		vertexList.push_back({ pos1 });
+		vertexList.push_back({ pos2 });
+	}
+
+	void CreateGrid() {
+		float size = 1.0f;
+		float spacing = 0.04f;
+		int lineCount = (int)(size / spacing);
+
+		float x = -size / 2.0f;
+		float y = -size / 2.0f;
+		float xS = spacing, yS = spacing;
+
+		y = -size / 2.0f;
+		for (int i = 0; i <= lineCount; i++)
+		{
+			if (i != lineCount / 2)
+				AddLine({ x,y, 0, 1 }, { x + size, y, 0, 1 });
+			else
+				AddLine({ x, y, 0, 1 }, { x + size, y, 0, 1 });
+			y += yS;
+		}
+		y = -size / 2.0f;
+		x = -size / 2.0f;
+		for (int i = 0; i <= lineCount; i++)
+		{
+			if (i != lineCount / 2)
+				AddLine({ x, y, 0, 1 }, { x, y + size, 0, 1 });
+			else
+				AddLine({ x, y, 0, 1 }, { x, y + size, 0, 1 });
+			x += xS;
+		}
+	}
+
 	// TODO: Part 2b
 		// TODO: Part 2f
 	Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GVulkanSurface _vlk)
@@ -67,30 +133,16 @@ public:
 		vlk.GetDevice((void**)&device);
 		vlk.GetPhysicalDevice((void**)&physicalDevice);
 
-		// TODO: Part 1b
-		// TODO: Part 1c
-		// Create Vertex Buffer
-		Vertex verts[] = {
-			//Right Line
-		   { 0.0f,  0.5f, 0.0f, 1.0f },
-		   { 0.5f, -0.5f, 0.0f, 1.0f },
-
-		   // Bottom Line
-		  { -0.5f, -0.5f, 0.0f, 1.0f },
-		  {  0.5f, -0.5f, 0.0f, 1.0f },
-
-		  //Left Line
-		 { -0.5f, -0.5f, 0.0f, 1.0f },
-		 {  0.0f,  0.5f, 0.0f, 1.0f }
-		};
-
+		//// TODO: Part 1b
+		//// TODO: Part 1c
+		//// Create Vertex Buffer
 		// TODO: Part 1d
-
+		CreateGrid();
 		// Transfer triangle data to the vertex buffer. (staging would be prefered here)
-		GvkHelper::create_buffer(physicalDevice, device, sizeof(verts),
+		GvkHelper::create_buffer(physicalDevice, device, sizeof(vertexList[0]) * vertexList.size(),
 			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | 
 			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexHandle, &vertexData);
-		GvkHelper::write_to_buffer(device, vertexData, verts, sizeof(verts));
+		GvkHelper::write_to_buffer(device, vertexData, vertexList.data(), sizeof(vertexList[0]) * vertexList.size());
 
 		/***************** SHADER INTIALIZATION ******************/
 		// Intialize runtime shader compiler HLSL -> SPIRV
@@ -151,8 +203,9 @@ public:
 		vertex_binding_description.stride = sizeof(Vertex);
 		vertex_binding_description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 		// TODO: Part 1c
-		VkVertexInputAttributeDescription vertex_attribute_description[1] = {
+		VkVertexInputAttributeDescription vertex_attribute_description[] = {
 			{ 0, 0, VK_FORMAT_R32G32_SFLOAT, 0 } //uv, normal, etc....
+			//{ 0, 0, VK_FORMAT_R32G32_SFLOAT, 16 }
 		};
 		VkPipelineVertexInputStateCreateInfo input_vertex_info = {};
 		input_vertex_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -298,7 +351,7 @@ public:
 		// now we can draw
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vertexHandle, offsets);
-		vkCmdDraw(commandBuffer, 6, 1, 0, 0); // TODO: Part 1b // TODO: Part 1c
+		vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertexList.size()), 1, 0, 0); // TODO: Part 1b // TODO: Part 1c
 		// TODO: Part 3e
 	}
 	// TODO: Part 4b
