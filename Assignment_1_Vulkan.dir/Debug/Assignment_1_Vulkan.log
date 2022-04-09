@@ -61,23 +61,20 @@ C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64075): message : see declaration of 'GW::I::GAudioImplementation::ResumeMusic'
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GAudioImplementation::GW::I::GAudioImplementation::StopMusic' via dominance
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64079): message : see declaration of 'GW::I::GAudioImplementation::StopMusic'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(70735,3): warning C4250: 'GW::I::GBufferedInputImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Register' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4724): message : see declaration of 'GW::I::GEventGeneratorImplementation::Register'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(70735,3): warning C4250: 'GW::I::GBufferedInputImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Deregister' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4737): message : see declaration of 'GW::I::GEventGeneratorImplementation::Deregister'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(70735,3): warning C4250: 'GW::I::GBufferedInputImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Observers' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4760): message : see declaration of 'GW::I::GEventGeneratorImplementation::Observers'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(70735,3): warning C4250: 'GW::I::GBufferedInputImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Push' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4768): message : see declaration of 'GW::I::GEventGeneratorImplementation::Push'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(74103,3): warning C4250: 'GW::I::GControllerImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Register' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4724): message : see declaration of 'GW::I::GEventGeneratorImplementation::Register'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(74103,3): warning C4250: 'GW::I::GControllerImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Deregister' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4737): message : see declaration of 'GW::I::GEventGeneratorImplementation::Deregister'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(74103,3): warning C4250: 'GW::I::GControllerImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Observers' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4760): message : see declaration of 'GW::I::GEventGeneratorImplementation::Observers'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(74103,3): warning C4250: 'GW::I::GControllerImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Push' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4768): message : see declaration of 'GW::I::GEventGeneratorImplementation::Push'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\renderer.h(145,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\renderer.h(205,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\renderer.h(481,41): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(16871,4): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
+          with
+          [
+              _Ty=double
+          ]
+C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\renderer.h(164): message : see reference to function template instantiation 'GW::GReturn GW::MATH::GMatrix::RotateXGlobalF<const GW::MATH::GMATRIXF&,double,GW::MATH::GMATRIXF&>(const GW::MATH::GMATRIXF &,double &&,GW::MATH::GMATRIXF &)' being compiled
+C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(16873,4): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
+          with
+          [
+              _Ty=double
+          ]
+C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\renderer.h(172): message : see reference to function template instantiation 'GW::GReturn GW::MATH::GMatrix::RotateYGlobalF<const GW::MATH::GMATRIXF&,double,GW::MATH::GMATRIXF&>(const GW::MATH::GMATRIXF &,double &&,GW::MATH::GMATRIXF &)' being compiled
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(1496,1): warning C4244: 'argument': conversion from '_Ty' to 'unsigned int', possible loss of data
           with
           [
@@ -85,6 +82,8 @@ C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(1496,1)
           ]
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(1597): message : see reference to function template instantiation 'GW::GReturn GW::I::GProxy<GW::I::GVulkanSurfaceInterface,GW::I::GVulkanSurfaceImplementation,GW::SYSTEM::GWindow,unsigned __int64>::allocate<GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char**,int,nullptr,int,nullptr,bool>(GW::SYSTEM::GWindow &&,GW::GRAPHICS::GGraphicsInitOptions &&,unsigned __int64 &&,const char **&&,int &&,nullptr &&,int &&,nullptr &&,bool &&)' being compiled
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(1597): message : see reference to function template instantiation 'GW::GReturn GW::I::GProxy<GW::I::GVulkanSurfaceInterface,GW::I::GVulkanSurfaceImplementation,GW::SYSTEM::GWindow,unsigned __int64>::allocate<GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char**,int,nullptr,int,nullptr,bool>(GW::SYSTEM::GWindow &&,GW::GRAPHICS::GGraphicsInitOptions &&,unsigned __int64 &&,const char **&&,int &&,nullptr &&,int &&,nullptr &&,bool &&)' being compiled
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\main.cpp(48): message : see reference to function template instantiation 'GW::GReturn GW::I::GProxy<GW::I::GVulkanSurfaceInterface,GW::I::GVulkanSurfaceImplementation,GW::SYSTEM::GWindow,unsigned __int64>::Create<GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char**,int,nullptr,int,nullptr,bool,std::enable_if<true,void>>(GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char **,int,nullptr,int,nullptr,bool)' being compiled
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\main.cpp(46): message : see reference to function template instantiation 'GW::GReturn GW::I::GProxy<GW::I::GVulkanSurfaceInterface,GW::I::GVulkanSurfaceImplementation,GW::SYSTEM::GWindow,unsigned __int64>::Create<GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char**,int,nullptr,int,nullptr,bool,std::enable_if<true,void>>(GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char **,int,nullptr,int,nullptr,bool)' being compiled
+C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\main.cpp(49): message : see reference to function template instantiation 'GW::GReturn GW::I::GProxy<GW::I::GVulkanSurfaceInterface,GW::I::GVulkanSurfaceImplementation,GW::SYSTEM::GWindow,unsigned __int64>::Create<GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char**,int,nullptr,int,nullptr,bool,std::enable_if<true,void>>(GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char **,int,nullptr,int,nullptr,bool)' being compiled
+C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\main.cpp(47): message : see reference to function template instantiation 'GW::GReturn GW::I::GProxy<GW::I::GVulkanSurfaceInterface,GW::I::GVulkanSurfaceImplementation,GW::SYSTEM::GWindow,unsigned __int64>::Create<GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char**,int,nullptr,int,nullptr,bool,std::enable_if<true,void>>(GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char **,int,nullptr,int,nullptr,bool)' being compiled
+  XTime.cpp
+  Generating Code...
   Assignment_1_Vulkan.vcxproj -> C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Debug\Assignment_1_Vulkan.exe

@@ -314,7 +314,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\main.cpp" />
+    <ClCompile Include="XTime.cpp" />
     <ClInclude Include="C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\renderer.h" />
+    <ClInclude Include="XTime.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\ZERO_CHECK.vcxproj">
