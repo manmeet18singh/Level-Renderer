@@ -1,145 +1,77 @@
 // minimalistic code to draw a single triangle, this is not part of the API.
+// TODO: Part 1b
 #include "shaderc/shaderc.h" // needed for compiling shaders at runtime
-#include "XTime.h"
-#include <vector>
 #ifdef _WIN32 // must use MT platform DLL libraries on windows
-#pragma comment(lib, "shaderc_combined.lib") 
+	#pragma comment(lib, "shaderc_combined.lib") 
 #endif
 // Simple Vertex Shader
 const char* vertexShaderSource = R"(
+// TODO: 2i
 // an ultra simple hlsl vertex shader
-
 // TODO: Part 2b
-[[vk::push_constant]] 
-cbuffer SHADER_VARS
+// TODO: Part 4g
+// TODO: Part 2i
+// TODO: Part 3e
+// TODO: Part 4a
+// TODO: Part 1f
+// TODO: Part 4b
+float4 main(float2 inputVertex : POSITION) : SV_POSITION
 {
-    matrix World;
-	matrix View;
-}
-
-// TODO: Part 2f, Part 3b
-// TODO: Part 1c
-
-struct VS_INPUT
-{
-    float4 Pos : POSITION;
-};
-
-struct PS_INPUT
-{
-    float4 Pos : SV_POSITION;
-};
-
-PS_INPUT main(VS_INPUT input)
-{
-
-	// TODO: Part 2d
-	// TODO: Part 2f, Part 3b
-    PS_INPUT output = (PS_INPUT) 0;
-    output.Pos = mul(World, input.Pos);
-    output.Pos = mul(View, output.Pos);
-	
-    //output.Pos = mul(output.Pos, Projection);
-    //output.Norm = mul(input.Norm, (float3x3) World);
-    //output.Tex = input.Tex;
-    return output;
+    // TODO: Part 1h
+	return float4(inputVertex, 0, 1);
+	// TODO: Part 2i
+		// TODO: Part 4e
+	// TODO: Part 4b
+		// TODO: Part 4e
 }
 )";
 // Simple Pixel Shader
 const char* pixelShaderSource = R"(
+// TODO: Part 2b
+// TODO: Part 4g
+// TODO: Part 2i
+// TODO: Part 3e
 // an ultra simple hlsl pixel shader
+// TODO: Part 4b
 float4 main() : SV_TARGET 
 {	
-	return float4(0.25f, 0.75f, 0.75f, 0); // TODO: Part	
+	return float4(0.75f ,0.75f, 0.25f, 0); // TODO: Part 1a
+	// TODO: Part 3a
+	// TODO: Part 4c
+	// TODO: Part 4g (half-vector or reflect method your choice)
 }
 )";
 // Creation, Rendering & Cleanup
 class Renderer
 {
+	// TODO: Part 2b
+	
 	// proxy handles
 	GW::SYSTEM::GWindow win;
 	GW::GRAPHICS::GVulkanSurface vlk;
 	GW::CORE::GEventReceiver shutdown;
-	// TODO: Part 4a
-	GW::INPUT::GInput PROXY_input;
-	GW::INPUT::GController PROXY_controller;
-	// TODO: Part 2a
-	GW::MATH::GMATRIXF MATRIX_World;
-	GW::MATH::GMatrix PROXY_matrix;
-	// TODO: Part 3d
-	GW::MATH::GMATRIXF MATRIX_Wall_North;
-	GW::MATH::GMATRIXF MATRIX_Wall_East;
-	GW::MATH::GMATRIXF MATRIX_Wall_South;
-	GW::MATH::GMATRIXF MATRIX_Wall_West;
-	GW::MATH::GMATRIXF MATRIX_Ceiling;	
-	GW::MATH::GMATRIXF MATRIX_Floor;
-	// TODO: Part 2e
-	GW::MATH::GMATRIXF MATRIX_View;
-	// TODO: Part 3a
-	GW::MATH::GMATRIXF MATRIX_Projection;
-	// 
+	
 	// what we need at a minimum to draw a triangle
 	VkDevice device = nullptr;
 	VkBuffer vertexHandle = nullptr;
 	VkDeviceMemory vertexData = nullptr;
+	// TODO: Part 1g
+	// TODO: Part 2c
 	VkShaderModule vertexShader = nullptr;
 	VkShaderModule pixelShader = nullptr;
 	// pipeline settings for drawing (also required)
 	VkPipeline pipeline = nullptr;
 	VkPipelineLayout pipelineLayout = nullptr;
-public:
-	// TODO: Part 1c
-
-	XTime timer;
-
-	struct ColorVertex
-	{
-		GW::MATH::GVECTORF pos;
-		GW::MATH::GVECTORF clr;
-	};
-
-	std::vector<ColorVertex> vertexList;
-
-	void AddLine(GW::MATH::GVECTORF pos1, GW::MATH::GVECTORF pos2, GW::MATH::GVECTORF color)
-	{
-		vertexList.push_back({ pos1, color });
-		vertexList.push_back({ pos2, color });
-	}
-
-	void CreateGrid() {
-		float size = 1.0f;
-		float spacing = 0.04f;
-		int lineCount = (int)(size / spacing);
-
-		float x = -size / 2.0f;
-		float y = -size / 2.0f;
-		float xS = spacing, yS = spacing;
-
-		y = -size / 2.0f;
-		for (int i = 0; i <= lineCount; i++)
-		{
-			AddLine({ x, y, 0, 1 }, { x + size, y, 0, 1 }, { 1.0f, 1.0f, 1.0f, 1.0f });
-			y += yS;
-		}
-		y = -size / 2.0f;
-		x = -size / 2.0f;
-		for (int i = 0; i <= lineCount; i++)
-		{
-			AddLine({ x, y, 0, 1 }, { x, y + size, 0, 1 }, { 1.0f, 1.0f, 1.0f, 1.0f });
-			x += xS;
-		}
-	}
-
-	// TODO: Part 2b	
-	struct SHADER_VARS
-	{
-		GW::MATH::GMATRIXF world;
-		GW::MATH::GMATRIXF view_projection;
-	};
-
-	SHADER_VARS shader_vars;
-
+	// TODO: Part 2e
 	// TODO: Part 2f
+	// TODO: Part 2g
+		// TODO: Part 4f
+		
+	// TODO: Part 2a
+	// TODO: Part 2b
+	// TODO: Part 4g
+public:
+
 	Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GVulkanSurface _vlk)
 	{
 		win = _win;
@@ -147,64 +79,10 @@ public:
 		unsigned int width, height;
 		win.GetClientWidth(width);
 		win.GetClientHeight(height);
-		
-		// TODO: Part 4a
-		timer = XTime();
-		PROXY_input.Create(win);
-		//PROXY_controller.Create();
-	
-#pragma region WORLD VIEW PROJ MATRIX
-
 		// TODO: Part 2a
-		PROXY_matrix.Create();
-
-		// TODO: Part 3d		
-		
-		//Floor Matrix
-		PROXY_matrix.RotateXGlobalF(GW::MATH::GIdentityMatrixF, 1.5708, MATRIX_Floor);
-		PROXY_matrix.TranslateGlobalF(MATRIX_Floor, GW::MATH::GVECTORF{ 0.0f, 0.5f, 0.0f , 0.0f }, MATRIX_Floor);
-
-		//Ceiling Matrix
-		PROXY_matrix.RotateXGlobalF(GW::MATH::GIdentityMatrixF, 1.5708, MATRIX_Ceiling);
-		PROXY_matrix.TranslateGlobalF(MATRIX_Ceiling, GW::MATH::GVECTORF{ 0.0f, -0.5f, 0.0f , 0.0f }, MATRIX_Ceiling);
-
-		//North Wall Matrix
-		PROXY_matrix.RotateYGlobalF(GW::MATH::GIdentityMatrixF, 1.5708, MATRIX_Wall_North);
-		PROXY_matrix.TranslateGlobalF(MATRIX_Wall_North, GW::MATH::GVECTORF{ 0.5f, 0.0f, 0.0f, 0.0f }, MATRIX_Wall_North);
-
-		//South Wall Matrix
-		PROXY_matrix.RotateYGlobalF(GW::MATH::GIdentityMatrixF, 1.5708, MATRIX_Wall_South);
-		PROXY_matrix.TranslateGlobalF(MATRIX_Wall_South, GW::MATH::GVECTORF{ -0.5f, 0.0f, 0.0f, 0.0f }, MATRIX_Wall_South);
-
-		//East Wall Matrix
-		PROXY_matrix.RotateYGlobalF(GW::MATH::GIdentityMatrixF, 3.14159, MATRIX_Wall_East);
-		PROXY_matrix.TranslateGlobalF(MATRIX_Wall_East, GW::MATH::GVECTORF{ 0.0f, 0.0f, 0.5f, 0.0f }, MATRIX_Wall_East);
-
-		////West Wall Matrix
-		PROXY_matrix.RotateYGlobalF(GW::MATH::GIdentityMatrixF, 3.14159, MATRIX_Wall_West);
-		PROXY_matrix.TranslateGlobalF(MATRIX_Wall_West, GW::MATH::GVECTORF{ 0.0f, 0.0f, -0.5f, 0.0f }, MATRIX_Wall_West);
-		 //TODO: Part 2e
-
-
-		// View Matrix and Projection Matrix Stuff
-				// TODO: Part 3a
-		GW::MATH::GVECTORF Eye = { 0.25f, -0.125, -0.25f };
-		GW::MATH::GVECTORF At = { 0.0f, 0.0f, 0.0f };
-		GW::MATH::GVECTORF Up = { 0.0f, 1.0f, 0.0f };
-
-		PROXY_matrix.LookAtLHF(Eye, At, Up, MATRIX_View);
-
-		float aspect;
-		vlk.GetAspectRatio(aspect);
-
-		PROXY_matrix.ProjectionDirectXLHF(1.13446f, aspect, 0.1f, 100.0f, MATRIX_Projection);
-
-		// TODO: Part 3b
-		//Combine view and projection mat and save into shader var struct
-		PROXY_matrix.MultiplyMatrixF(MATRIX_View, MATRIX_Projection, shader_vars.view_projection);
-
-
-#pragma endregion
+		// TODO: Part 2b
+		// TODO: Part 4g
+		// TODO: part 3b
 
 		/***************** GEOMETRY INTIALIZATION ******************/
 		// Grab the device & physical device so we can allocate some stuff
@@ -212,24 +90,27 @@ public:
 		vlk.GetDevice((void**)&device);
 		vlk.GetPhysicalDevice((void**)&physicalDevice);
 
-		//// TODO: Part 1b
-		//// TODO: Part 1c
-		//// Create Vertex Buffer
-		// TODO: Part 1d
-		CreateGrid();
+		// TODO: Part 1c
+		// Create Vertex Buffer
+		float verts[] = {
+			   0,   0.5f,
+			 0.5f, -0.5f,
+			-0.5f, -0.5f
+		};
 		// Transfer triangle data to the vertex buffer. (staging would be prefered here)
-		GvkHelper::create_buffer(physicalDevice, device, sizeof(vertexList[0]) * vertexList.size(),
-			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+		GvkHelper::create_buffer(physicalDevice, device, sizeof(verts),
+			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | 
 			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexHandle, &vertexData);
-		GvkHelper::write_to_buffer(device, vertexData, vertexList.data(), sizeof(vertexList[0]) * vertexList.size());
+		GvkHelper::write_to_buffer(device, vertexData, verts, sizeof(verts));
+		// TODO: Part 1g
+		// TODO: Part 2d
 
 		/***************** SHADER INTIALIZATION ******************/
 		// Intialize runtime shader compiler HLSL -> SPIRV
 		shaderc_compiler_t compiler = shaderc_compiler_initialize();
 		shaderc_compile_options_t options = shaderc_compile_options_initialize();
 		shaderc_compile_options_set_source_language(options, shaderc_source_language_hlsl);
-		// TODO: Part 3C
-		shaderc_compile_options_set_invert_y(options, false);
+		shaderc_compile_options_set_invert_y(options, true); // TODO: Part 2i
 #ifndef NDEBUG
 		shaderc_compile_options_set_generate_debug_info(options);
 #endif
@@ -273,18 +154,16 @@ public:
 		// Assembly State
 		VkPipelineInputAssemblyStateCreateInfo assembly_create_info = {};
 		assembly_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-		assembly_create_info.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+		assembly_create_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		assembly_create_info.primitiveRestartEnable = false;
+		// TODO: Part 1e
 		// Vertex Input State
-		// TODO: Part 1c
 		VkVertexInputBindingDescription vertex_binding_description = {};
 		vertex_binding_description.binding = 0;
-		vertex_binding_description.stride = sizeof(ColorVertex);
+		vertex_binding_description.stride = sizeof(float) * 2;
 		vertex_binding_description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-		// TODO: Part 1c
-		VkVertexInputAttributeDescription vertex_attribute_description[] = {
+		VkVertexInputAttributeDescription vertex_attribute_description[1] = {
 			{ 0, 0, VK_FORMAT_R32G32_SFLOAT, 0 } //uv, normal, etc....
-			//{ 0, 0, VK_FORMAT_R32G32_SFLOAT, 16 }
 		};
 		VkPipelineVertexInputStateCreateInfo input_vertex_info = {};
 		input_vertex_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -294,9 +173,9 @@ public:
 		input_vertex_info.pVertexAttributeDescriptions = vertex_attribute_description;
 		// Viewport State (we still need to set this up even though we will overwrite the values)
 		VkViewport viewport = {
-			0, 0, static_cast<float>(width), static_cast<float>(height), 0, 1
-		};
-		VkRect2D scissor = { {0, 0}, {width, height} };
+            0, 0, static_cast<float>(width), static_cast<float>(height), 0, 1
+        };
+        VkRect2D scissor = { {0, 0}, {width, height} };
 		VkPipelineViewportStateCreateInfo viewport_create_info = {};
 		viewport_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 		viewport_create_info.viewportCount = 1;
@@ -356,7 +235,7 @@ public:
 		color_blend_create_info.blendConstants[2] = 0.0f;
 		color_blend_create_info.blendConstants[3] = 0.0f;
 		// Dynamic State 
-		VkDynamicState dynamic_state[2] = {
+		VkDynamicState dynamic_state[2] = { 
 			// By setting these we do not need to re-create the pipeline on Resize
 			VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR
 		};
@@ -364,23 +243,27 @@ public:
 		dynamic_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 		dynamic_create_info.dynamicStateCount = 2;
 		dynamic_create_info.pDynamicStates = dynamic_state;
-		// TODO: Part 2c
-		VkPushConstantRange constant_range = {};
-		constant_range.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS;
-		constant_range.offset = 0;
-		constant_range.size = sizeof(SHADER_VARS);
-
-
+		
+		// TODO: Part 2e
+		// TODO: Part 2f
+			// TODO: Part 4f
+		// TODO: Part 2g
+			// TODO: Part 4f
+		// TODO: Part 2h
+			// TODO: Part 4f
+	
 		// Descriptor pipeline layout
 		VkPipelineLayoutCreateInfo pipeline_layout_create_info = {};
 		pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		// TODO: Part 2e
 		pipeline_layout_create_info.setLayoutCount = 0;
 		pipeline_layout_create_info.pSetLayouts = VK_NULL_HANDLE;
-		pipeline_layout_create_info.pushConstantRangeCount = 1; // TODO: Part 2d 
-		pipeline_layout_create_info.pPushConstantRanges = &constant_range; // TODO: Part 2d
-		vkCreatePipelineLayout(device, &pipeline_layout_create_info,
+		// TODO: Part 3c
+		pipeline_layout_create_info.pushConstantRangeCount = 0;
+		pipeline_layout_create_info.pPushConstantRanges = nullptr;
+		vkCreatePipelineLayout(device, &pipeline_layout_create_info, 
 			nullptr, &pipelineLayout);
-		// Pipeline State... (FINALLY) 
+	    // Pipeline State... (FINALLY) 
 		VkGraphicsPipelineCreateInfo pipeline_create_info = {};
 		pipeline_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 		pipeline_create_info.stageCount = 2;
@@ -397,7 +280,7 @@ public:
 		pipeline_create_info.renderPass = renderPass;
 		pipeline_create_info.subpass = 0;
 		pipeline_create_info.basePipelineHandle = VK_NULL_HANDLE;
-		vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1,
+		vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, 
 			&pipeline_create_info, nullptr, &pipeline);
 
 		/***************** CLEANUP / SHUTDOWN ******************/
@@ -406,10 +289,12 @@ public:
 			if (+shutdown.Find(GW::GRAPHICS::GVulkanSurface::Events::RELEASE_RESOURCES, true)) {
 				CleanUp(); // unlike D3D we must be careful about destroy timing
 			}
-			});
+		});
 	}
 	void Render()
 	{
+		// TODO: Part 2a
+		// TODO: Part 4d
 		// grab the current Vulkan commandBuffer
 		unsigned int currentBuffer;
 		vlk.GetSwapchainCurrentImage(currentBuffer);
@@ -421,114 +306,39 @@ public:
 		win.GetClientHeight(height);
 		// setup the pipeline's dynamic settings
 		VkViewport viewport = {
-			0, 0, static_cast<float>(width), static_cast<float>(height), 0, 1
-		};
-		VkRect2D scissor = { {0, 0}, {width, height} };
+            0, 0, static_cast<float>(width), static_cast<float>(height), 0, 1
+        };
+        VkRect2D scissor = { {0, 0}, {width, height} };
 		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 		
-		//// TODO: Part 3a
-		//GW::MATH::GVECTORF Eye = { 0.25f, -0.125, -0.25f };
-		//GW::MATH::GVECTORF At = { 0.0f, 0.0f, 0.0f };
-		//GW::MATH::GVECTORF Up = { 0.0f, 1.0f, 0.0f };
-
-		//PROXY_matrix.LookAtLHF(Eye, At, Up, MATRIX_View);
-
-		//float aspect;
-		//vlk.GetAspectRatio(aspect);
-
-		//PROXY_matrix.ProjectionDirectXLHF(1.13446f, aspect, 0.1f, 100.0f, MATRIX_Projection);
-		//
-		//// TODO: Part 3b
-		////Combine view and projection mat and save into shader var struct
-		//PROXY_matrix.MultiplyMatrixF(MATRIX_View, MATRIX_Projection, shader_vars.view_projection);
-
-		// TODO: Part 2b
-			// TODO: Part 2f, Part 3b
-		// TODO: Part 2d
-
 		// now we can draw
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vertexHandle, offsets);
-
-		// TODO: Part 3e
-#pragma region Draw Grid Cube
-
-		//std::cout << shader_vars.view_projection.row4.y << std::endl;
-
-		shader_vars.world = MATRIX_Floor;
-		vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(SHADER_VARS), &shader_vars);
-		vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertexList.size()), 1, 0, 0);
-
-		shader_vars.world = MATRIX_Ceiling;
-		vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(SHADER_VARS), &shader_vars);
-		vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertexList.size()), 1, 0, 0);
-
-		shader_vars.world = MATRIX_Wall_North;
-		vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(SHADER_VARS), &shader_vars);
-		vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertexList.size()), 1, 0, 0);
-
-		shader_vars.world = MATRIX_Wall_South;
-		vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(SHADER_VARS), &shader_vars);
-		vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertexList.size()), 1, 0, 0);
-
-		shader_vars.world = MATRIX_Wall_East;
-		vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(SHADER_VARS), &shader_vars);
-		vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertexList.size()), 1, 0, 0); 
-
-		shader_vars.world = MATRIX_Wall_West;
-		vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(SHADER_VARS), &shader_vars);
-		vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertexList.size()), 1, 0, 0); 
-
-#pragma endregion
-
-	}
-	// TODO: Part 4b
-	void UpdateCamera() {
-
-		// TODO: Part 4c
-		GW::MATH::GMATRIXF Camera;
-
-		PROXY_matrix.InverseF(shader_vars.view_projection, Camera);
-
+		// TODO: Part 1h
 		// TODO: Part 4d
-		float KEY_spc, KEY_lShift;
-		float KEY_rTrigger, KEY_lTrigger;
-
-		const float Camera_Speed = 0.3f;
-		float Seconds_Passed_Since_Last_Frame = timer.Delta();
-
-
-		PROXY_input.GetState(G_KEY_SPACE, KEY_spc);
-		PROXY_input.GetState(G_KEY_LEFTSHIFT, KEY_lShift);
-
-		PROXY_controller.GetState(0, G_RIGHT_TRIGGER_AXIS, KEY_rTrigger);
-		PROXY_controller.GetState(0, G_LEFT_TRIGGER_AXIS, KEY_lTrigger);
-
-		float Total_Y_Change = KEY_spc - KEY_lShift + KEY_rTrigger - KEY_lTrigger;
-
-		Camera.row4.y += Total_Y_Change * Camera_Speed * Seconds_Passed_Since_Last_Frame;
-
-		// TODO: Part 4e
-		// TODO: Part 4f
-		// TODO: Part 4g
+		// TODO: Part 2i
+		// TODO: Part 3b
+			// TODO: Part 3d
+		vkCmdDraw(commandBuffer, 3, 1, 0, 0); // TODO: Part 1d, 1h
 		
-		// TODO: Part 4c		
-		PROXY_matrix.InverseF(Camera, shader_vars.view_projection);
-
 	}
-
+	
 private:
 	void CleanUp()
 	{
 		// wait till everything has completed
 		vkDeviceWaitIdle(device);
 		// Release allocated buffers, shaders & pipeline
+		// TODO: Part 1g
+		// TODO: Part 2d
 		vkDestroyBuffer(device, vertexHandle, nullptr);
 		vkFreeMemory(device, vertexData, nullptr);
 		vkDestroyShaderModule(device, vertexShader, nullptr);
 		vkDestroyShaderModule(device, pixelShader, nullptr);
+		// TODO: Part 2e
+		// TODO: part 2f
 		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 		vkDestroyPipeline(device, pipeline, nullptr);
 	}

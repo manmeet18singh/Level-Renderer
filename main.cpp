@@ -2,17 +2,14 @@
 #define GATEWARE_ENABLE_CORE // All libraries need this
 #define GATEWARE_ENABLE_SYSTEM // Graphics libs require system level libraries
 #define GATEWARE_ENABLE_GRAPHICS // Enables all Graphics Libraries
+// TODO: Part 3a
 // Ignore some GRAPHICS libraries we aren't going to use
 #define GATEWARE_DISABLE_GDIRECTX11SURFACE // we have another template for this
 #define GATEWARE_DISABLE_GDIRECTX12SURFACE // we have another template for this
 #define GATEWARE_DISABLE_GRASTERSURFACE // we have another template for this
 #define GATEWARE_DISABLE_GOPENGLSURFACE // we have another template for this
-// TODO: Part 2a
-#define GATEWARE_ENABLE_MATH 
-// TODO: Part 4a
-#define GATEWARE_ENABLE_INPUT
 // With what we want & what we don't defined we can include the API
-#include "Gateware/Gateware.h"
+#include "../Gateware/Gateware.h"
 #include "renderer.h"
 // open some namespaces to compact the code a bit
 using namespace GW;
@@ -28,9 +25,8 @@ int main()
 	if (+win.Create(0, 0, 800, 600, GWindowStyle::WINDOWEDBORDERED))
 	{
 		// TODO: Part 1a
-		win.SetWindowName("Manmeet Singh - Assignment 1 - VULKAN");
 		VkClearValue clrAndDepth[2];
-		clrAndDepth[0].color = { {0.75f, 0.4f, 0.25f, 1} }; // TODO: Part 1a
+		clrAndDepth[0].color = { {0.75f, 0, 0, 1} };
 		clrAndDepth[1].depthStencil = { 1.0f, 0u };
 		msgs.Create([&](const GW::GEvent& e) {
 			GW::SYSTEM::GWindow::Events q;
@@ -42,7 +38,7 @@ int main()
 		const char* debugLayers[] = {
 			"VK_LAYER_KHRONOS_validation", // standard validation layer
 			//"VK_LAYER_LUNARG_standard_validation", // add if not on MacOS
-			"VK_LAYER_RENDERDOC_Capture" // add this if you have installed RenderDoc
+			//"VK_LAYER_RENDERDOC_Capture" // add this if you have installed RenderDoc
 		};
 		if (+vulkan.Create(	win, GW::GRAPHICS::DEPTH_BUFFER_SUPPORT, 
 							sizeof(debugLayers)/sizeof(debugLayers[0]),
@@ -56,8 +52,6 @@ int main()
 			{
 				if (+vulkan.StartFrame(2, clrAndDepth))
 				{
-					// TODO: Part 4b
-					//renderer.UpdateCamera();
 					renderer.Render();
 					vulkan.EndFrame(true);
 				}

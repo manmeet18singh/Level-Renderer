@@ -173,9 +173,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
-    <ProjectReference Include="C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Assignment_1_Vulkan.vcxproj">
-      <Project>{25171FB4-2064-3E71-9686-4811346BB48A}</Project>
-      <Name>Assignment_1_Vulkan</Name>
+    <ProjectReference Include="C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Assignment_2_Vulkan.vcxproj">
+      <Project>{9879AC70-902C-3F58-918B-7876ACEAC915}</Project>
+      <Name>Assignment_2_Vulkan</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
