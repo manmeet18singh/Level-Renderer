@@ -220,7 +220,7 @@ public:
 		shaderc_compile_options_t options = shaderc_compile_options_initialize();
 		shaderc_compile_options_set_source_language(options, shaderc_source_language_hlsl);
 		// TODO: Part 3C
-		shaderc_compile_options_set_invert_y(options, false);
+		shaderc_compile_options_set_invert_y(options, true);
 #ifndef NDEBUG
 		shaderc_compile_options_set_generate_debug_info(options);
 #endif
@@ -429,7 +429,7 @@ public:
 		float aspect;
 		vlk.GetAspectRatio(aspect);
 
-		PROXY_matrix.ProjectionDirectXLHF(1.13446f, aspect, 0.1f, 100.0f, MATRIX_Projection);
+		PROXY_matrix.ProjectionVulkanLHF(1.13446f, aspect, 0.1f, 100.0f, MATRIX_Projection);
 
 		// TODO: Part 3b
 		//Combine view and projection mat and save into shader var struct
