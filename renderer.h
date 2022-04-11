@@ -1,5 +1,6 @@
 // minimalistic code to draw a single triangle, this is not part of the API.
 // TODO: Part 1b
+#include "Assets/FSLogo.h"
 #include "shaderc/shaderc.h" // needed for compiling shaders at runtime
 #ifdef _WIN32 // must use MT platform DLL libraries on windows
 	#pragma comment(lib, "shaderc_combined.lib") 
@@ -14,15 +15,44 @@ const char* vertexShaderSource = R"(
 // TODO: Part 3e
 // TODO: Part 4a
 // TODO: Part 1f
-// TODO: Part 4b
-float4 main(float2 inputVertex : POSITION) : SV_POSITION
+
+//[[vk::push_constant]] 
+//cbuffer SHADER_VARS
+//{
+//    matrix World;
+//    matrix View;
+//    //matrix Projection;
+//}
+
+struct VS_INPUT
 {
-    // TODO: Part 1h
-	return float4(inputVertex, 0, 1);
-	// TODO: Part 2i
-		// TODO: Part 4e
-	// TODO: Part 4b
-		// TODO: Part 4e
+    float4 Pos : POSITION;
+    float3 Norm : NORMAL;
+    float2 Tex : TEXCOORD0;
+};
+
+struct PS_INPUT
+{
+    float4 Pos : SV_POSITION;
+    float3 Norm : NORMAL;
+    float2 Tex : TEXCOORD1;
+};
+// TODO: Part 4b
+
+PS_INPUT main(VS_INPUT input)
+{
+    PS_INPUT output = (PS_INPUT) 0;
+   /* output.Pos = mul(input.Pos, World);
+    output.Pos = mul(output.Pos, View);
+    output.Pos = mul(output.Pos, Projection);
+    output.Norm = mul(input.Norm, (float3x3) World);
+    output.Tex = input.Tex;*/
+
+	output.Pos = float4(input.Pos.x, input.Pos.y - 0.75f , input.Pos.z + 0.75f, input.Pos.w);
+	output.Norm = input.Norm;
+	output.Tex = input.Tex;
+
+    return output;
 }
 )";
 // Simple Pixel Shader
@@ -56,6 +86,8 @@ class Renderer
 	VkBuffer vertexHandle = nullptr;
 	VkDeviceMemory vertexData = nullptr;
 	// TODO: Part 1g
+	VkBuffer indexHandle = nullptr;
+	VkDeviceMemory indexData = nullptr;
 	// TODO: Part 2c
 	VkShaderModule vertexShader = nullptr;
 	VkShaderModule pixelShader = nullptr;
@@ -68,6 +100,11 @@ class Renderer
 		// TODO: Part 4f
 		
 	// TODO: Part 2a
+	GW::MATH::GMATRIXF MATRIX_World;
+	GW::MATH::GMatrix PROXY_matrix;
+
+	GW::MATH::GMATRIXF MATRIX_View;
+	GW::MATH::GMATRIXF MATRIX_Projection;
 	// TODO: Part 2b
 	// TODO: Part 4g
 public:
@@ -80,6 +117,17 @@ public:
 		win.GetClientWidth(width);
 		win.GetClientHeight(height);
 		// TODO: Part 2a
+		PROXY_matrix.Create();
+
+		//TODO ROTATE ON Y OVER TIME
+		PROXY_matrix.RotateYGlobalF(GW::MATH::GIdentityMatrixF, 1.5708, MATRIX_World);
+
+		GW::MATH::GVECTORF Eye = { 0.75f, 0.25, -1.5f };
+		GW::MATH::GVECTORF At = { 0.15f, 0.75f, 0.0f };
+		GW::MATH::GVECTORF Up = { 0.0f, 1.0f, 0.0f };
+
+		PROXY_matrix.LookAtLHF(Eye, At, Up, MATRIX_View);
+
 		// TODO: Part 2b
 		// TODO: Part 4g
 		// TODO: part 3b
@@ -92,17 +140,17 @@ public:
 
 		// TODO: Part 1c
 		// Create Vertex Buffer
-		float verts[] = {
-			   0,   0.5f,
-			 0.5f, -0.5f,
-			-0.5f, -0.5f
-		};
+		//float verts[] = FSLogo_vertices;
 		// Transfer triangle data to the vertex buffer. (staging would be prefered here)
-		GvkHelper::create_buffer(physicalDevice, device, sizeof(verts),
+		GvkHelper::create_buffer(physicalDevice, device, sizeof(FSLogo_vertices),
 			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | 
 			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexHandle, &vertexData);
-		GvkHelper::write_to_buffer(device, vertexData, verts, sizeof(verts));
+		GvkHelper::write_to_buffer(device, vertexData, FSLogo_vertices, sizeof(FSLogo_vertices));
 		// TODO: Part 1g
+		GvkHelper::create_buffer(physicalDevice, device, sizeof(FSLogo_indices),
+			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexHandle, &indexData);
+		GvkHelper::write_to_buffer(device, indexData, FSLogo_indices, sizeof(FSLogo_indices));
 		// TODO: Part 2d
 
 		/***************** SHADER INTIALIZATION ******************/
@@ -160,7 +208,7 @@ public:
 		// Vertex Input State
 		VkVertexInputBindingDescription vertex_binding_description = {};
 		vertex_binding_description.binding = 0;
-		vertex_binding_description.stride = sizeof(float) * 2;
+		vertex_binding_description.stride = sizeof(OBJ_VERT);
 		vertex_binding_description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 		VkVertexInputAttributeDescription vertex_attribute_description[1] = {
 			{ 0, 0, VK_FORMAT_R32G32_SFLOAT, 0 } //uv, normal, etc....
@@ -294,6 +342,15 @@ public:
 	void Render()
 	{
 		// TODO: Part 2a
+		float aspect;
+		vlk.GetAspectRatio(aspect);
+
+		PROXY_matrix.ProjectionVulkanLHF(G_DEGREE_TO_RADIAN(65), aspect, 0.1f, 100.0f, MATRIX_Projection);
+
+		// TODO: Part 3b
+		//Combine view and projection mat and save into shader var struct
+		//PROXY_matrix.MultiplyMatrixF(MATRIX_View, MATRIX_Projection, shader_vars.view_projection);
+
 		// TODO: Part 4d
 		// grab the current Vulkan commandBuffer
 		unsigned int currentBuffer;
@@ -317,12 +374,14 @@ public:
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vertexHandle, offsets);
 		// TODO: Part 1h
+		vkCmdBindIndexBuffer(commandBuffer, indexHandle, *offsets, VK_INDEX_TYPE_UINT32);
 		// TODO: Part 4d
 		// TODO: Part 2i
 		// TODO: Part 3b
 			// TODO: Part 3d
-		vkCmdDraw(commandBuffer, 3, 1, 0, 0); // TODO: Part 1d, 1h
-		
+		for (int i = 0; i < FSLogo_meshcount; i++) {
+			vkCmdDrawIndexed(commandBuffer, FSLogo_meshes[i].indexCount, 1, FSLogo_meshes[i].indexOffset, 0, 0); // TODO: Part 1d, 1h
+		}
 	}
 	
 private:
@@ -332,6 +391,8 @@ private:
 		vkDeviceWaitIdle(device);
 		// Release allocated buffers, shaders & pipeline
 		// TODO: Part 1g
+		vkDestroyBuffer(device, indexHandle, nullptr);
+		vkFreeMemory(device, indexData, nullptr);
 		// TODO: Part 2d
 		vkDestroyBuffer(device, vertexHandle, nullptr);
 		vkFreeMemory(device, vertexData, nullptr);
