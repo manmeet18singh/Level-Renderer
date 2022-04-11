@@ -1,0 +1,10 @@
+^C:\USERS\MANMEET SINGH\DESKTOP\PROJECT-AND-PORTFOLIO\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/Manmeet Singh/Desktop/Project-And-Portfolio" "-BC:/Users/Manmeet Singh/Desktop/Project-And-Portfolio" --check-stamp-file "C:/Users/Manmeet Singh/Desktop/Project-And-Portfolio/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
