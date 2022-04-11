@@ -185,6 +185,25 @@ public:
 		PROXY_matrix.TranslateGlobalF(MATRIX_Wall_West, GW::MATH::GVECTORF{ 0.0f, 0.0f, -0.5f, 0.0f }, MATRIX_Wall_West);
 		 //TODO: Part 2e
 
+
+		// View Matrix and Projection Matrix Stuff
+				// TODO: Part 3a
+		GW::MATH::GVECTORF Eye = { 0.25f, -0.125, -0.25f };
+		GW::MATH::GVECTORF At = { 0.0f, 0.0f, 0.0f };
+		GW::MATH::GVECTORF Up = { 0.0f, 1.0f, 0.0f };
+
+		PROXY_matrix.LookAtLHF(Eye, At, Up, MATRIX_View);
+
+		float aspect;
+		vlk.GetAspectRatio(aspect);
+
+		PROXY_matrix.ProjectionDirectXLHF(1.13446f, aspect, 0.1f, 100.0f, MATRIX_Projection);
+
+		// TODO: Part 3b
+		//Combine view and projection mat and save into shader var struct
+		PROXY_matrix.MultiplyMatrixF(MATRIX_View, MATRIX_Projection, shader_vars.view_projection);
+
+
 #pragma endregion
 
 		/***************** GEOMETRY INTIALIZATION ******************/
@@ -409,21 +428,21 @@ public:
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 		
-		// TODO: Part 3a
-		GW::MATH::GVECTORF Eye = { 0.25f, -0.125, -0.25f };
-		GW::MATH::GVECTORF At = { 0.0f, 0.0f, 0.0f };
-		GW::MATH::GVECTORF Up = { 0.0f, 1.0f, 0.0f };
+		//// TODO: Part 3a
+		//GW::MATH::GVECTORF Eye = { 0.25f, -0.125, -0.25f };
+		//GW::MATH::GVECTORF At = { 0.0f, 0.0f, 0.0f };
+		//GW::MATH::GVECTORF Up = { 0.0f, 1.0f, 0.0f };
 
-		PROXY_matrix.LookAtLHF(Eye, At, Up, MATRIX_View);
+		//PROXY_matrix.LookAtLHF(Eye, At, Up, MATRIX_View);
 
-		float aspect;
-		vlk.GetAspectRatio(aspect);
+		//float aspect;
+		//vlk.GetAspectRatio(aspect);
 
-		PROXY_matrix.ProjectionDirectXLHF(1.13446f, aspect, 0.1f, 100.0f, MATRIX_Projection);
-		
-		// TODO: Part 3b
-		//Combine view and projection mat and save into shader var struct
-		PROXY_matrix.MultiplyMatrixF(MATRIX_View, MATRIX_Projection, shader_vars.view_projection);
+		//PROXY_matrix.ProjectionDirectXLHF(1.13446f, aspect, 0.1f, 100.0f, MATRIX_Projection);
+		//
+		//// TODO: Part 3b
+		////Combine view and projection mat and save into shader var struct
+		//PROXY_matrix.MultiplyMatrixF(MATRIX_View, MATRIX_Projection, shader_vars.view_projection);
 
 		// TODO: Part 2b
 			// TODO: Part 2f, Part 3b
@@ -435,6 +454,8 @@ public:
 
 		// TODO: Part 3e
 #pragma region Draw Grid Cube
+
+		//std::cout << shader_vars.view_projection.row4.y << std::endl;
 
 		shader_vars.world = MATRIX_Floor;
 		vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(SHADER_VARS), &shader_vars);
@@ -472,10 +493,8 @@ public:
 		PROXY_matrix.InverseF(shader_vars.view_projection, Camera);
 
 		// TODO: Part 4d
-		float KEY_spc = 0;
-		float KEY_lShift = 0;
-		float KEY_rTrigger = 0;
-		float KEY_lTrigger = 0;
+		float KEY_spc, KEY_lShift;
+		float KEY_rTrigger, KEY_lTrigger;
 
 		const float Camera_Speed = 0.3f;
 		float Seconds_Passed_Since_Last_Frame = timer.Delta();
@@ -484,20 +503,19 @@ public:
 		PROXY_input.GetState(G_KEY_SPACE, KEY_spc);
 		PROXY_input.GetState(G_KEY_LEFTSHIFT, KEY_lShift);
 
-		PROXY_input.GetState(G_RIGHT_TRIGGER_AXIS, KEY_rTrigger);
-		PROXY_input.GetState(G_LEFT_TRIGGER_AXIS, KEY_lTrigger);
+		PROXY_controller.GetState(0, G_RIGHT_TRIGGER_AXIS, KEY_rTrigger);
+		PROXY_controller.GetState(0, G_LEFT_TRIGGER_AXIS, KEY_lTrigger);
 
 		float Total_Y_Change = KEY_spc - KEY_lShift + KEY_rTrigger - KEY_lTrigger;
 
 		Camera.row4.y += Total_Y_Change * Camera_Speed * Seconds_Passed_Since_Last_Frame;
-
 
 		// TODO: Part 4e
 		// TODO: Part 4f
 		// TODO: Part 4g
 		
 		// TODO: Part 4c		
-		PROXY_matrix.InverseF(shader_vars.view_projection, shader_vars.view_projection);
+		PROXY_matrix.InverseF(Camera, shader_vars.view_projection);
 
 	}
 

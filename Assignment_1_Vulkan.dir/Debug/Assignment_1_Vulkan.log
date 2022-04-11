@@ -61,8 +61,8 @@ C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64075): message : see declaration of 'GW::I::GAudioImplementation::ResumeMusic'
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GAudioImplementation::GW::I::GAudioImplementation::StopMusic' via dominance
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64079): message : see declaration of 'GW::I::GAudioImplementation::StopMusic'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\renderer.h(205,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\renderer.h(481,41): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\renderer.h(224,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\renderer.h(500,41): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(16871,4): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
           with
           [
@@ -84,6 +84,4 @@ C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(1597): 
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(1597): message : see reference to function template instantiation 'GW::GReturn GW::I::GProxy<GW::I::GVulkanSurfaceInterface,GW::I::GVulkanSurfaceImplementation,GW::SYSTEM::GWindow,unsigned __int64>::allocate<GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char**,int,nullptr,int,nullptr,bool>(GW::SYSTEM::GWindow &&,GW::GRAPHICS::GGraphicsInitOptions &&,unsigned __int64 &&,const char **&&,int &&,nullptr &&,int &&,nullptr &&,bool &&)' being compiled
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\main.cpp(49): message : see reference to function template instantiation 'GW::GReturn GW::I::GProxy<GW::I::GVulkanSurfaceInterface,GW::I::GVulkanSurfaceImplementation,GW::SYSTEM::GWindow,unsigned __int64>::Create<GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char**,int,nullptr,int,nullptr,bool,std::enable_if<true,void>>(GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char **,int,nullptr,int,nullptr,bool)' being compiled
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\main.cpp(47): message : see reference to function template instantiation 'GW::GReturn GW::I::GProxy<GW::I::GVulkanSurfaceInterface,GW::I::GVulkanSurfaceImplementation,GW::SYSTEM::GWindow,unsigned __int64>::Create<GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char**,int,nullptr,int,nullptr,bool,std::enable_if<true,void>>(GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char **,int,nullptr,int,nullptr,bool)' being compiled
-  XTime.cpp
-  Generating Code...
   Assignment_1_Vulkan.vcxproj -> C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Debug\Assignment_1_Vulkan.exe
