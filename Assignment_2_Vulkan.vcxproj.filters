@@ -20,5 +20,16 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{51FF9235-F57B-3C7F-89DB-34387F078722}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files">
+      <UniqueIdentifier>{35278a18-26ca-448b-a2fa-a4aea1cb4830}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="VS.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="PS.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

@@ -8,7 +8,14 @@
       <FullPath>C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Debug\Assignment_2_Vulkan.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
-  <ContentFiles />
+  <ContentFiles>
+    <ContentFile>
+      <FullPath>C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Debug\PS.cso</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Debug\VS.cso</FullPath>
+    </ContentFile>
+  </ContentFiles>
   <SatelliteDlls />
   <NonRecipeFileRefs />
 </Project>

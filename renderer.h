@@ -5,76 +5,85 @@
 #ifdef _WIN32 // must use MT platform DLL libraries on windows
 	#pragma comment(lib, "shaderc_combined.lib") 
 #endif
-// Simple Vertex Shader
-const char* vertexShaderSource = R"(
-// TODO: 2i
-// an ultra simple hlsl vertex shader
-// TODO: Part 2b
-// TODO: Part 4g
-// TODO: Part 2i
-// TODO: Part 3e
-// TODO: Part 4a
-// TODO: Part 1f
-
-//[[vk::push_constant]] 
-//cbuffer SHADER_VARS
+//// Simple Vertex Shader
+//const char* vertexShaderSource = R"(
+//// TODO: 2i
+//// an ultra simple hlsl vertex shader
+//// TODO: Part 2b
+//// TODO: Part 4g
+//// TODO: Part 2i
+//// TODO: Part 3e
+//// TODO: Part 4a
+//// TODO: Part 1f
+//
+////[[vk::push_constant]] 
+////cbuffer SHADER_VARS
+////{
+////    matrix World;
+////    matrix View;
+////    //matrix Projection;
+////}
+//
+//struct VS_INPUT
 //{
-//    matrix World;
-//    matrix View;
-//    //matrix Projection;
+//    float4 Pos : POSITION;
+//    float3 Norm : NORMAL;
+//    float2 Tex : TEXCOORD0;
+//};
+//
+//struct PS_INPUT
+//{
+//    float4 Pos : SV_POSITION;
+//    float3 Norm : NORMAL;
+//    float2 Tex : TEXCOORD1;
+//};
+//// TODO: Part 4b
+//
+//PS_INPUT main(VS_INPUT input)
+//{
+//    PS_INPUT output = (PS_INPUT) 0;
+//   /* output.Pos = mul(input.Pos, World);
+//    output.Pos = mul(output.Pos, View);
+//    output.Pos = mul(output.Pos, Projection);
+//    output.Norm = mul(input.Norm, (float3x3) World);
+//    output.Tex = input.Tex;*/
+//
+//	output.Pos = input.Pos;
+//	output.Norm = input.Norm;
+//	output.Tex = input.Tex;
+//
+//    return output;
 //}
-
-struct VS_INPUT
-{
-    float4 Pos : POSITION;
-    float3 Norm : NORMAL;
-    float2 Tex : TEXCOORD0;
-};
-
-struct PS_INPUT
-{
-    float4 Pos : SV_POSITION;
-    float3 Norm : NORMAL;
-    float2 Tex : TEXCOORD1;
-};
-// TODO: Part 4b
-
-PS_INPUT main(VS_INPUT input)
-{
-    PS_INPUT output = (PS_INPUT) 0;
-   /* output.Pos = mul(input.Pos, World);
-    output.Pos = mul(output.Pos, View);
-    output.Pos = mul(output.Pos, Projection);
-    output.Norm = mul(input.Norm, (float3x3) World);
-    output.Tex = input.Tex;*/
-
-	output.Pos = float4(input.Pos.x, input.Pos.y - 0.75f , input.Pos.z + 0.75f, input.Pos.w);
-	output.Norm = input.Norm;
-	output.Tex = input.Tex;
-
-    return output;
-}
-)";
-// Simple Pixel Shader
-const char* pixelShaderSource = R"(
-// TODO: Part 2b
-// TODO: Part 4g
-// TODO: Part 2i
-// TODO: Part 3e
-// an ultra simple hlsl pixel shader
-// TODO: Part 4b
-float4 main() : SV_TARGET 
-{	
-	return float4(0.75f ,0.75f, 0.25f, 0); // TODO: Part 1a
-	// TODO: Part 3a
-	// TODO: Part 4c
-	// TODO: Part 4g (half-vector or reflect method your choice)
-}
-)";
+//)";
+//// Simple Pixel Shader
+//const char* pixelShaderSource = R"(
+//// TODO: Part 2b
+//// TODO: Part 4g
+//// TODO: Part 2i
+//// TODO: Part 3e
+//// an ultra simple hlsl pixel shader
+//// TODO: Part 4b
+//float4 main() : SV_TARGET 
+//{	
+//	return float4(0.75f ,0.75f, 0.25f, 0); // TODO: Part 1a
+//	// TODO: Part 3a
+//	// TODO: Part 4c
+//	// TODO: Part 4g (half-vector or reflect method your choice)
+//}
+//)";
 // Creation, Rendering & Cleanup
 class Renderer
 {
 	// TODO: Part 2b
+#define MAX_SUBMESH_PER_DRAW 1024
+	struct SHADER_MODEL_DATA
+	{
+		GW::MATH::GVECTORF SunDirection, SunColor;
+		GW::MATH::GMATRIXF ViewMatrix, ProjectionMatrix;
+
+		GW::MATH::GMATRIXF matricies[MAX_SUBMESH_PER_DRAW];
+		OBJ_ATTRIBUTES materials[MAX_SUBMESH_PER_DRAW];
+	};
 	
 	// proxy handles
 	GW::SYSTEM::GWindow win;
@@ -89,13 +98,18 @@ class Renderer
 	VkBuffer indexHandle = nullptr;
 	VkDeviceMemory indexData = nullptr;
 	// TODO: Part 2c
+	std::vector<VkBuffer> storageBufferHandle;
+	std::vector<VkDeviceMemory> storageBufferData;
+
 	VkShaderModule vertexShader = nullptr;
 	VkShaderModule pixelShader = nullptr;
 	// pipeline settings for drawing (also required)
 	VkPipeline pipeline = nullptr;
 	VkPipelineLayout pipelineLayout = nullptr;
 	// TODO: Part 2e
+	VkDescriptorSetLayout storageBufferSetLayout;
 	// TODO: Part 2f
+	VkDescriptorPool storageBufferDescriptorPool;
 	// TODO: Part 2g
 		// TODO: Part 4f
 		
@@ -105,7 +119,11 @@ class Renderer
 
 	GW::MATH::GMATRIXF MATRIX_View;
 	GW::MATH::GMATRIXF MATRIX_Projection;
+	GW::MATH::GVECTORF VECTOR_Light_Direction;
+	GW::MATH::GVECTORF VECTOR_Light_Color;
+
 	// TODO: Part 2b
+	SHADER_MODEL_DATA shader_model_data;
 	// TODO: Part 4g
 public:
 
@@ -128,7 +146,24 @@ public:
 
 		PROXY_matrix.LookAtLHF(Eye, At, Up, MATRIX_View);
 
+		GW::MATH::GVECTORF lightDir = {-1.0f, -1.0f, 2.0f};
+		GW::MATH::GVector::NormalizeF(lightDir, VECTOR_Light_Direction);
+
+		VECTOR_Light_Color = { 0.9f, 0.9f, 1.0f, 1.0f };
+
 		// TODO: Part 2b
+		shader_model_data.ViewMatrix = MATRIX_View;
+		shader_model_data.ProjectionMatrix = MATRIX_Projection;
+
+		shader_model_data.SunColor = VECTOR_Light_Color;
+		shader_model_data.SunDirection = VECTOR_Light_Direction;
+
+		for (int i = 0; i < FSLogo_materialcount; i++)
+		{
+			shader_model_data.materials [i] = FSLogo_materials[i].attrib;
+		}
+
+
 		// TODO: Part 4g
 		// TODO: part 3b
 
@@ -148,10 +183,23 @@ public:
 		GvkHelper::write_to_buffer(device, vertexData, FSLogo_vertices, sizeof(FSLogo_vertices));
 		// TODO: Part 1g
 		GvkHelper::create_buffer(physicalDevice, device, sizeof(FSLogo_indices),
-			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+			VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
 			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexHandle, &indexData);
 		GvkHelper::write_to_buffer(device, indexData, FSLogo_indices, sizeof(FSLogo_indices));
+		
 		// TODO: Part 2d
+		unsigned int max_active_frames; 
+		vlk.GetSwapchainImageCount(max_active_frames);
+		storageBufferHandle.resize(max_active_frames);
+		storageBufferData.resize(max_active_frames);
+
+		for (int i = 0; i < max_active_frames; i++)
+		{
+			GvkHelper::create_buffer(physicalDevice, device, sizeof(shader_model_data),
+				VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &storageBufferHandle[i], &storageBufferData[i]);
+			GvkHelper::write_to_buffer(device, storageBufferData[i], &shader_model_data, sizeof(shader_model_data));
+		}
 
 		/***************** SHADER INTIALIZATION ******************/
 		// Intialize runtime shader compiler HLSL -> SPIRV
@@ -163,17 +211,22 @@ public:
 		shaderc_compile_options_set_generate_debug_info(options);
 #endif
 		// Create Vertex Shader
+		std::string Vertex_Shader_String = Renderer::ShaderAsString("VS.hlsl");
+
 		shaderc_compilation_result_t result = shaderc_compile_into_spv( // compile
-			compiler, vertexShaderSource, strlen(vertexShaderSource),
+			compiler, Vertex_Shader_String.c_str(), strlen(Vertex_Shader_String.c_str()),
 			shaderc_vertex_shader, "main.vert", "main", options);
 		if (shaderc_result_get_compilation_status(result) != shaderc_compilation_status_success) // errors?
 			std::cout << "Vertex Shader Errors: " << shaderc_result_get_error_message(result) << std::endl;
 		GvkHelper::create_shader_module(device, shaderc_result_get_length(result), // load into Vulkan
 			(char*)shaderc_result_get_bytes(result), &vertexShader);
 		shaderc_result_release(result); // done
+
 		// Create Pixel Shader
+		std::string Pixel_Shader_String = Renderer::ShaderAsString("PS.hlsl");
+
 		result = shaderc_compile_into_spv( // compile
-			compiler, pixelShaderSource, strlen(pixelShaderSource),
+			compiler, Pixel_Shader_String.c_str(), strlen(Pixel_Shader_String.c_str()),
 			shaderc_fragment_shader, "main.frag", "main", options);
 		if (shaderc_result_get_compilation_status(result) != shaderc_compilation_status_success) // errors?
 			std::cout << "Pixel Shader Errors: " << shaderc_result_get_error_message(result) << std::endl;
@@ -293,7 +346,34 @@ public:
 		dynamic_create_info.pDynamicStates = dynamic_state;
 		
 		// TODO: Part 2e
+		VkDescriptorSetLayoutBinding storage_buffer_discriptor_binding = {};
+		storage_buffer_discriptor_binding.descriptorCount = 1;
+		storage_buffer_discriptor_binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		storage_buffer_discriptor_binding.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS;
+		storage_buffer_discriptor_binding.binding = 0;
+		storage_buffer_discriptor_binding.pImmutableSamplers = VK_NULL_HANDLE;
+
+		VkDescriptorSetLayoutCreateInfo storage_buffer_discriptor_create_info = {};
+		storage_buffer_discriptor_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		storage_buffer_discriptor_create_info.flags = 0;
+		storage_buffer_discriptor_create_info.bindingCount = 1;
+		storage_buffer_discriptor_create_info.pNext = VK_NULL_HANDLE;
+		storage_buffer_discriptor_create_info.pBindings = &storage_buffer_discriptor_binding;
+		vkCreateDescriptorSetLayout(device, &storage_buffer_discriptor_create_info, nullptr, &storageBufferSetLayout);
+
 		// TODO: Part 2f
+		VkDescriptorPoolSize discriptor_pool_size = {};
+		discriptor_pool_size.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		discriptor_pool_size.descriptorCount =
+
+		VkDescriptorPoolCreateInfo storage_buffer_discriptor_pool_create_info = {};
+		storage_buffer_discriptor_pool_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		storage_buffer_discriptor_pool_create_info.pNext = VK_NULL_HANDLE;
+		storage_buffer_discriptor_pool_create_info.flags = 0;
+		storage_buffer_discriptor_pool_create_info.maxSets = 
+		storage_buffer_discriptor_pool_create_info.poolSizeCount
+		storage_buffer_discriptor_pool_create_info.pPoolSizes
+
 			// TODO: Part 4f
 		// TODO: Part 2g
 			// TODO: Part 4f
@@ -304,8 +384,8 @@ public:
 		VkPipelineLayoutCreateInfo pipeline_layout_create_info = {};
 		pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		// TODO: Part 2e
-		pipeline_layout_create_info.setLayoutCount = 0;
-		pipeline_layout_create_info.pSetLayouts = VK_NULL_HANDLE;
+		pipeline_layout_create_info.setLayoutCount = 1;
+		pipeline_layout_create_info.pSetLayouts = &storageBufferSetLayout;
 		// TODO: Part 3c
 		pipeline_layout_create_info.pushConstantRangeCount = 0;
 		pipeline_layout_create_info.pPushConstantRanges = nullptr;
@@ -384,6 +464,20 @@ public:
 		}
 	}
 	
+	std::string ShaderAsString(const char* shaderFilePath) {
+		std::string output;
+		unsigned int stringLength = 0;
+		GW::SYSTEM::GFile file; file.Create();
+		file.GetFileSize(shaderFilePath, stringLength);
+		if (stringLength && +file.OpenBinaryRead(shaderFilePath)) {
+			output.resize(stringLength);
+			file.Read(&output[0], stringLength);
+		}
+		else
+			std::cout << "ERROR: Shader Source File \"" << shaderFilePath << "\" Not Found!" << std::endl;
+		return output;
+	}
+
 private:
 	void CleanUp()
 	{
@@ -394,11 +488,20 @@ private:
 		vkDestroyBuffer(device, indexHandle, nullptr);
 		vkFreeMemory(device, indexData, nullptr);
 		// TODO: Part 2d
+		for (int i = 0; i < storageBufferHandle.size(); i++) {
+			vkDestroyBuffer(device, storageBufferHandle[i], nullptr);
+		}
+
+		for (int i = 0; i < storageBufferData.size(); i++) {
+			vkFreeMemory(device, storageBufferData[i], nullptr);
+		}
+
 		vkDestroyBuffer(device, vertexHandle, nullptr);
 		vkFreeMemory(device, vertexData, nullptr);
 		vkDestroyShaderModule(device, vertexShader, nullptr);
 		vkDestroyShaderModule(device, pixelShader, nullptr);
 		// TODO: Part 2e
+		vkDestroyDescriptorSetLayout(device, storageBufferSetLayout, nullptr);
 		// TODO: part 2f
 		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 		vkDestroyPipeline(device, pipeline, nullptr);
