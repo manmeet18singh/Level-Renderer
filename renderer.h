@@ -98,8 +98,8 @@ class Renderer
 	VkBuffer indexHandle = nullptr;
 	VkDeviceMemory indexData = nullptr;
 	// TODO: Part 2c
-	std::vector<VkBuffer> storageBufferHandle;
-	std::vector<VkDeviceMemory> storageBufferData;
+	std::vector<VkBuffer> SB_Handle;
+	std::vector<VkDeviceMemory> SB_Data;
 
 	VkShaderModule vertexShader = nullptr;
 	VkShaderModule pixelShader = nullptr;
@@ -107,10 +107,11 @@ class Renderer
 	VkPipeline pipeline = nullptr;
 	VkPipelineLayout pipelineLayout = nullptr;
 	// TODO: Part 2e
-	VkDescriptorSetLayout storageBufferSetLayout;
+	VkDescriptorSetLayout SB_SetLayout;
 	// TODO: Part 2f
-	VkDescriptorPool storageBufferDescriptorPool;
+	VkDescriptorPool SB_DescriptorPool;
 	// TODO: Part 2g
+	VkDescriptorSet SB_DescriptorSet;
 		// TODO: Part 4f
 		
 	// TODO: Part 2a
@@ -138,13 +139,18 @@ public:
 		PROXY_matrix.Create();
 
 		//TODO ROTATE ON Y OVER TIME
-		PROXY_matrix.RotateYGlobalF(GW::MATH::GIdentityMatrixF, 1.5708, MATRIX_World);
+		//PROXY_matrix.RotateYGlobalF(GW::MATH::GIdentityMatrixF, 1.5708, MATRIX_World);
 
 		GW::MATH::GVECTORF Eye = { 0.75f, 0.25, -1.5f };
 		GW::MATH::GVECTORF At = { 0.15f, 0.75f, 0.0f };
 		GW::MATH::GVECTORF Up = { 0.0f, 1.0f, 0.0f };
 
 		PROXY_matrix.LookAtLHF(Eye, At, Up, MATRIX_View);
+
+		float aspect;
+		vlk.GetAspectRatio(aspect);
+
+		PROXY_matrix.ProjectionVulkanLHF(G_DEGREE_TO_RADIAN(65), aspect, 0.1f, 100.0f, MATRIX_Projection);
 
 		GW::MATH::GVECTORF lightDir = {-1.0f, -1.0f, 2.0f};
 		GW::MATH::GVector::NormalizeF(lightDir, VECTOR_Light_Direction);
@@ -157,6 +163,9 @@ public:
 
 		shader_model_data.SunColor = VECTOR_Light_Color;
 		shader_model_data.SunDirection = VECTOR_Light_Direction;
+
+		//shader_model_data.matricies[0] = MATRIX_World;
+		shader_model_data.matricies[0] = GW::MATH::GIdentityMatrixF;
 
 		for (int i = 0; i < FSLogo_materialcount; i++)
 		{
@@ -190,15 +199,15 @@ public:
 		// TODO: Part 2d
 		unsigned int max_active_frames; 
 		vlk.GetSwapchainImageCount(max_active_frames);
-		storageBufferHandle.resize(max_active_frames);
-		storageBufferData.resize(max_active_frames);
+		SB_Handle.resize(max_active_frames);
+		SB_Data.resize(max_active_frames);
 
 		for (int i = 0; i < max_active_frames; i++)
 		{
 			GvkHelper::create_buffer(physicalDevice, device, sizeof(shader_model_data),
 				VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &storageBufferHandle[i], &storageBufferData[i]);
-			GvkHelper::write_to_buffer(device, storageBufferData[i], &shader_model_data, sizeof(shader_model_data));
+				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &SB_Handle[i], &SB_Data[i]);
+			GvkHelper::write_to_buffer(device, SB_Data[i], &shader_model_data, sizeof(shader_model_data));
 		}
 
 		/***************** SHADER INTIALIZATION ******************/
@@ -206,7 +215,7 @@ public:
 		shaderc_compiler_t compiler = shaderc_compiler_initialize();
 		shaderc_compile_options_t options = shaderc_compile_options_initialize();
 		shaderc_compile_options_set_source_language(options, shaderc_source_language_hlsl);
-		shaderc_compile_options_set_invert_y(options, true); // TODO: Part 2i
+		shaderc_compile_options_set_invert_y(options, false); // TODO: Part 2i
 #ifndef NDEBUG
 		shaderc_compile_options_set_generate_debug_info(options);
 #endif
@@ -263,14 +272,16 @@ public:
 		vertex_binding_description.binding = 0;
 		vertex_binding_description.stride = sizeof(OBJ_VERT);
 		vertex_binding_description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-		VkVertexInputAttributeDescription vertex_attribute_description[1] = {
-			{ 0, 0, VK_FORMAT_R32G32_SFLOAT, 0 } //uv, normal, etc....
+		VkVertexInputAttributeDescription vertex_attribute_description[3] = {
+			{ 0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(OBJ_VERT, pos) }, //uv, normal, etc....
+			{ 1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(OBJ_VERT, uvw) }, //uvw
+			{ 2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(OBJ_VERT, nrm) }, //norm
 		};
 		VkPipelineVertexInputStateCreateInfo input_vertex_info = {};
 		input_vertex_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 		input_vertex_info.vertexBindingDescriptionCount = 1;
 		input_vertex_info.pVertexBindingDescriptions = &vertex_binding_description;
-		input_vertex_info.vertexAttributeDescriptionCount = 1;
+		input_vertex_info.vertexAttributeDescriptionCount = 3;
 		input_vertex_info.pVertexAttributeDescriptions = vertex_attribute_description;
 		// Viewport State (we still need to set this up even though we will overwrite the values)
 		VkViewport viewport = {
@@ -346,38 +357,74 @@ public:
 		dynamic_create_info.pDynamicStates = dynamic_state;
 		
 		// TODO: Part 2e
-		VkDescriptorSetLayoutBinding storage_buffer_discriptor_binding = {};
-		storage_buffer_discriptor_binding.descriptorCount = 1;
-		storage_buffer_discriptor_binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		storage_buffer_discriptor_binding.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS;
-		storage_buffer_discriptor_binding.binding = 0;
-		storage_buffer_discriptor_binding.pImmutableSamplers = VK_NULL_HANDLE;
+		VkDescriptorSetLayoutBinding sb_discriptor_binding = {};
+		sb_discriptor_binding.descriptorCount = 1;
+		sb_discriptor_binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		sb_discriptor_binding.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS;
+		sb_discriptor_binding.binding = 0;
+		sb_discriptor_binding.pImmutableSamplers = VK_NULL_HANDLE;
 
-		VkDescriptorSetLayoutCreateInfo storage_buffer_discriptor_create_info = {};
-		storage_buffer_discriptor_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-		storage_buffer_discriptor_create_info.flags = 0;
-		storage_buffer_discriptor_create_info.bindingCount = 1;
-		storage_buffer_discriptor_create_info.pNext = VK_NULL_HANDLE;
-		storage_buffer_discriptor_create_info.pBindings = &storage_buffer_discriptor_binding;
-		vkCreateDescriptorSetLayout(device, &storage_buffer_discriptor_create_info, nullptr, &storageBufferSetLayout);
+		VkDescriptorSetLayoutCreateInfo sb_discriptor_create_info = {};
+		sb_discriptor_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		sb_discriptor_create_info.flags = 0;
+		sb_discriptor_create_info.bindingCount = 1;
+		sb_discriptor_create_info.pNext = VK_NULL_HANDLE;
+		sb_discriptor_create_info.pBindings = &sb_discriptor_binding;
+
+		if(vkCreateDescriptorSetLayout(device, &sb_discriptor_create_info, nullptr, &SB_SetLayout) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create descriptor set layout!");
+		}
 
 		// TODO: Part 2f
 		VkDescriptorPoolSize discriptor_pool_size = {};
 		discriptor_pool_size.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		discriptor_pool_size.descriptorCount =
+		discriptor_pool_size.descriptorCount = static_cast<uint32_t>(max_active_frames);
 
-		VkDescriptorPoolCreateInfo storage_buffer_discriptor_pool_create_info = {};
-		storage_buffer_discriptor_pool_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-		storage_buffer_discriptor_pool_create_info.pNext = VK_NULL_HANDLE;
-		storage_buffer_discriptor_pool_create_info.flags = 0;
-		storage_buffer_discriptor_pool_create_info.maxSets = 
-		storage_buffer_discriptor_pool_create_info.poolSizeCount
-		storage_buffer_discriptor_pool_create_info.pPoolSizes
+		VkDescriptorPoolCreateInfo sb_discriptor_pool_create_info = {};
+		sb_discriptor_pool_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		sb_discriptor_pool_create_info.pNext = VK_NULL_HANDLE;
+		sb_discriptor_pool_create_info.flags = 0;
+		sb_discriptor_pool_create_info.maxSets = static_cast<uint32_t>(max_active_frames);
+		sb_discriptor_pool_create_info.poolSizeCount = 1;
+		sb_discriptor_pool_create_info.pPoolSizes = &discriptor_pool_size;
 
+		if(vkCreateDescriptorPool(device, &sb_discriptor_pool_create_info, nullptr, &SB_DescriptorPool) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create descriptor pool!");
+		}
 			// TODO: Part 4f
 		// TODO: Part 2g
+		VkDescriptorSetAllocateInfo sb_set_alloc_info = {};
+		sb_set_alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		sb_set_alloc_info.pSetLayouts = &SB_SetLayout;
+		sb_set_alloc_info.pNext = VK_NULL_HANDLE;
+		sb_set_alloc_info.descriptorSetCount = 1;
+		sb_set_alloc_info.descriptorPool = SB_DescriptorPool;
+
+		if (vkAllocateDescriptorSets(device, &sb_set_alloc_info, &SB_DescriptorSet) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate descriptor sets!");
+		}
 			// TODO: Part 4f
 		// TODO: Part 2h
+		VkDescriptorBufferInfo sb_descriptor_buffer_info{};
+		for (int i = 0; i < SB_Handle.size(); i++) {
+			sb_descriptor_buffer_info.buffer = SB_Handle[i];
+			sb_descriptor_buffer_info.offset = 0;
+			sb_descriptor_buffer_info.range = VK_WHOLE_SIZE;
+		}
+
+		VkWriteDescriptorSet sb_write_descriptor_set = {};
+		sb_write_descriptor_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		sb_write_descriptor_set.pNext = VK_NULL_HANDLE;
+		sb_write_descriptor_set.pTexelBufferView = VK_NULL_HANDLE;
+		sb_write_descriptor_set.dstSet = SB_DescriptorSet;
+		sb_write_descriptor_set.pBufferInfo = &sb_descriptor_buffer_info;
+		sb_write_descriptor_set.pImageInfo = VK_NULL_HANDLE;
+		sb_write_descriptor_set.dstBinding = 0;
+		sb_write_descriptor_set.descriptorCount = 1;
+		sb_write_descriptor_set.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		sb_write_descriptor_set.dstArrayElement = 0;
+		vkUpdateDescriptorSets(device, 1, &sb_write_descriptor_set, 0, VK_NULL_HANDLE);
+
 			// TODO: Part 4f
 	
 		// Descriptor pipeline layout
@@ -385,12 +432,12 @@ public:
 		pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		// TODO: Part 2e
 		pipeline_layout_create_info.setLayoutCount = 1;
-		pipeline_layout_create_info.pSetLayouts = &storageBufferSetLayout;
+		pipeline_layout_create_info.pSetLayouts = &SB_SetLayout;
 		// TODO: Part 3c
 		pipeline_layout_create_info.pushConstantRangeCount = 0;
 		pipeline_layout_create_info.pPushConstantRanges = nullptr;
-		vkCreatePipelineLayout(device, &pipeline_layout_create_info, 
-			nullptr, &pipelineLayout);
+		vkCreatePipelineLayout(device, &pipeline_layout_create_info, nullptr, &pipelineLayout);
+
 	    // Pipeline State... (FINALLY) 
 		VkGraphicsPipelineCreateInfo pipeline_create_info = {};
 		pipeline_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -408,8 +455,7 @@ public:
 		pipeline_create_info.renderPass = renderPass;
 		pipeline_create_info.subpass = 0;
 		pipeline_create_info.basePipelineHandle = VK_NULL_HANDLE;
-		vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, 
-			&pipeline_create_info, nullptr, &pipeline);
+		vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipeline_create_info, nullptr, &pipeline);
 
 		/***************** CLEANUP / SHUTDOWN ******************/
 		// GVulkanSurface will inform us when to release any allocated resources
@@ -422,14 +468,9 @@ public:
 	void Render()
 	{
 		// TODO: Part 2a
-		float aspect;
-		vlk.GetAspectRatio(aspect);
 
-		PROXY_matrix.ProjectionVulkanLHF(G_DEGREE_TO_RADIAN(65), aspect, 0.1f, 100.0f, MATRIX_Projection);
 
 		// TODO: Part 3b
-		//Combine view and projection mat and save into shader var struct
-		//PROXY_matrix.MultiplyMatrixF(MATRIX_View, MATRIX_Projection, shader_vars.view_projection);
 
 		// TODO: Part 4d
 		// grab the current Vulkan commandBuffer
@@ -457,6 +498,7 @@ public:
 		vkCmdBindIndexBuffer(commandBuffer, indexHandle, *offsets, VK_INDEX_TYPE_UINT32);
 		// TODO: Part 4d
 		// TODO: Part 2i
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &SB_DescriptorSet, 0, VK_NULL_HANDLE);
 		// TODO: Part 3b
 			// TODO: Part 3d
 		for (int i = 0; i < FSLogo_meshcount; i++) {
@@ -488,12 +530,12 @@ private:
 		vkDestroyBuffer(device, indexHandle, nullptr);
 		vkFreeMemory(device, indexData, nullptr);
 		// TODO: Part 2d
-		for (int i = 0; i < storageBufferHandle.size(); i++) {
-			vkDestroyBuffer(device, storageBufferHandle[i], nullptr);
+		for (int i = 0; i < SB_Handle.size(); i++) {
+			vkDestroyBuffer(device, SB_Handle[i], nullptr);
 		}
 
-		for (int i = 0; i < storageBufferData.size(); i++) {
-			vkFreeMemory(device, storageBufferData[i], nullptr);
+		for (int i = 0; i < SB_Data.size(); i++) {
+			vkFreeMemory(device, SB_Data[i], nullptr);
 		}
 
 		vkDestroyBuffer(device, vertexHandle, nullptr);
@@ -501,8 +543,9 @@ private:
 		vkDestroyShaderModule(device, vertexShader, nullptr);
 		vkDestroyShaderModule(device, pixelShader, nullptr);
 		// TODO: Part 2e
-		vkDestroyDescriptorSetLayout(device, storageBufferSetLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, SB_SetLayout, nullptr);
 		// TODO: part 2f
+		vkDestroyDescriptorPool(device, SB_DescriptorPool, nullptr);
 		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 		vkDestroyPipeline(device, pipeline, nullptr);
 	}

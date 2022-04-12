@@ -25,11 +25,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="VS.hlsl">
+    <None Include="VS.hlsl">
       <Filter>Shader Files</Filter>
-    </FxCompile>
-    <FxCompile Include="PS.hlsl">
+    </None>
+    <None Include="PS.hlsl">
       <Filter>Shader Files</Filter>
-    </FxCompile>
+    </None>
   </ItemGroup>
 </Project>

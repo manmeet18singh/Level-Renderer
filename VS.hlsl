@@ -1,4 +1,20 @@
+#pragma pack_matrix(row_major)
 #define MAX_SUBMESH_PER_DRAW 1024
+
+struct OBJ_ATTRIBUTES
+{
+    float3 Kd; // diffuse reflectivity
+    float d; // dissolve (transparency) 
+    float3 Ks; // specular reflectivity
+    float Ns; // specular exponent
+    float3 Ka; // ambient reflectivity
+    float sharpness; // local reflection map sharpness
+    float3 Tf; // transmission filter
+    float Ni; // optical density (index of refraction)
+    float3 Ke; // emissive reflectivity
+	uint illum; // illumination model
+};
+
 struct SHADER_MODEL_DATA
 {
     float4 SunDirection, SunColor;
@@ -8,26 +24,18 @@ struct SHADER_MODEL_DATA
     OBJ_ATTRIBUTES materials[MAX_SUBMESH_PER_DRAW];
 };
 
-[[vk::push_constant]] 
-cbuffer SHADER_VARS
-{
-    matrix World;
-    matrix View;
-    matrix Projection;
-}
-
 struct VS_INPUT
 {
-    float4 Pos : POSITION;
+    float3 Pos : POSITION;
     float3 Norm : NORMAL;
-    float2 Tex : TEXCOORD0;
+    float3 Uvw : TEXCOORD;
 };
 
 struct PS_INPUT
 {
     float4 Pos : SV_POSITION;
     float3 Norm : NORMAL;
-    float2 Tex : TEXCOORD1;
+    float3 Uvw : TEXCOORD;
 };
 // TODO: Part 4b
 
@@ -35,15 +43,13 @@ StructuredBuffer<SHADER_MODEL_DATA> SceneData;
 PS_INPUT main(VS_INPUT input)
 {
     PS_INPUT output = (PS_INPUT) 0;
-   /* output.Pos = mul(input.Pos, World);
-    output.Pos = mul(output.Pos, View);
-    output.Pos = mul(output.Pos, Projection);
-    output.Norm = mul(input.Norm, (float3x3) World);
-    output.Tex = input.Tex;*/
-
     output.Pos = float4(input.Pos, 1);
     output.Norm = input.Norm;
-    output.Tex = input.Tex;
+    output.Uvw = input.Uvw;
+    
+    output.Pos = mul(output.Pos, SceneData[0].matricies[0]);
+    output.Pos = mul(output.Pos, SceneData[0].ViewMatrix);
+    output.Pos = mul(output.Pos, SceneData[0].ProjectionMatrix);
 
     return output;
 }
