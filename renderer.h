@@ -3,7 +3,7 @@
 #include "Assets/FSLogo.h"
 #include "shaderc/shaderc.h" // needed for compiling shaders at runtime
 #ifdef _WIN32 // must use MT platform DLL libraries on windows
-	#pragma comment(lib, "shaderc_combined.lib") 
+#pragma comment(lib, "shaderc_combined.lib") 
 #endif
 //// Simple Vertex Shader
 //const char* vertexShaderSource = R"(
@@ -84,12 +84,12 @@ class Renderer
 		GW::MATH::GMATRIXF matricies[MAX_SUBMESH_PER_DRAW];
 		OBJ_ATTRIBUTES materials[MAX_SUBMESH_PER_DRAW];
 	};
-	
+
 	// proxy handles
 	GW::SYSTEM::GWindow win;
 	GW::GRAPHICS::GVulkanSurface vlk;
 	GW::CORE::GEventReceiver shutdown;
-	
+
 	// what we need at a minimum to draw a triangle
 	VkDevice device = nullptr;
 	VkBuffer vertexHandle = nullptr;
@@ -112,9 +112,9 @@ class Renderer
 	VkDescriptorPool SB_DescriptorPool;
 	// TODO: Part 2g
 	VkDescriptorSet SB_DescriptorSet;
-		// TODO: Part 4f
-		
-	// TODO: Part 2a
+	// TODO: Part 4f
+
+// TODO: Part 2a
 	GW::MATH::GMATRIXF MATRIX_World;
 	GW::MATH::GMatrix PROXY_matrix;
 
@@ -152,7 +152,7 @@ public:
 
 		PROXY_matrix.ProjectionVulkanLHF(G_DEGREE_TO_RADIAN(65), aspect, 0.1f, 100.0f, MATRIX_Projection);
 
-		GW::MATH::GVECTORF lightDir = {-1.0f, -1.0f, 2.0f};
+		GW::MATH::GVECTORF lightDir = { -1.0f, -1.0f, 2.0f };
 		GW::MATH::GVector::NormalizeF(lightDir, VECTOR_Light_Direction);
 
 		VECTOR_Light_Color = { 0.9f, 0.9f, 1.0f, 1.0f };
@@ -167,14 +167,13 @@ public:
 		//shader_model_data.matricies[0] = MATRIX_World;
 		shader_model_data.matricies[0] = GW::MATH::GIdentityMatrixF;
 
-		for (int i = 0; i < FSLogo_materialcount; i++)
-		{
-			shader_model_data.materials [i] = FSLogo_materials[i].attrib;
-		}
-
-
 		// TODO: Part 4g
 		// TODO: part 3b
+
+		for (int i = 0; i < FSLogo_materialcount; i++)
+		{
+			shader_model_data.materials[i] = FSLogo_materials[i].attrib;
+		}
 
 		/***************** GEOMETRY INTIALIZATION ******************/
 		// Grab the device & physical device so we can allocate some stuff
@@ -187,7 +186,7 @@ public:
 		//float verts[] = FSLogo_vertices;
 		// Transfer triangle data to the vertex buffer. (staging would be prefered here)
 		GvkHelper::create_buffer(physicalDevice, device, sizeof(FSLogo_vertices),
-			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | 
+			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
 			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexHandle, &vertexData);
 		GvkHelper::write_to_buffer(device, vertexData, FSLogo_vertices, sizeof(FSLogo_vertices));
 		// TODO: Part 1g
@@ -195,9 +194,9 @@ public:
 			VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
 			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexHandle, &indexData);
 		GvkHelper::write_to_buffer(device, indexData, FSLogo_indices, sizeof(FSLogo_indices));
-		
+
 		// TODO: Part 2d
-		unsigned int max_active_frames; 
+		unsigned int max_active_frames;
 		vlk.GetSwapchainImageCount(max_active_frames);
 		SB_Handle.resize(max_active_frames);
 		SB_Data.resize(max_active_frames);
@@ -285,9 +284,9 @@ public:
 		input_vertex_info.pVertexAttributeDescriptions = vertex_attribute_description;
 		// Viewport State (we still need to set this up even though we will overwrite the values)
 		VkViewport viewport = {
-            0, 0, static_cast<float>(width), static_cast<float>(height), 0, 1
-        };
-        VkRect2D scissor = { {0, 0}, {width, height} };
+			0, 0, static_cast<float>(width), static_cast<float>(height), 0, 1
+		};
+		VkRect2D scissor = { {0, 0}, {width, height} };
 		VkPipelineViewportStateCreateInfo viewport_create_info = {};
 		viewport_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 		viewport_create_info.viewportCount = 1;
@@ -347,7 +346,7 @@ public:
 		color_blend_create_info.blendConstants[2] = 0.0f;
 		color_blend_create_info.blendConstants[3] = 0.0f;
 		// Dynamic State 
-		VkDynamicState dynamic_state[2] = { 
+		VkDynamicState dynamic_state[2] = {
 			// By setting these we do not need to re-create the pipeline on Resize
 			VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR
 		};
@@ -355,7 +354,7 @@ public:
 		dynamic_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 		dynamic_create_info.dynamicStateCount = 2;
 		dynamic_create_info.pDynamicStates = dynamic_state;
-		
+
 		// TODO: Part 2e
 		VkDescriptorSetLayoutBinding sb_discriptor_binding = {};
 		sb_discriptor_binding.descriptorCount = 1;
@@ -371,7 +370,7 @@ public:
 		sb_discriptor_create_info.pNext = VK_NULL_HANDLE;
 		sb_discriptor_create_info.pBindings = &sb_discriptor_binding;
 
-		if(vkCreateDescriptorSetLayout(device, &sb_discriptor_create_info, nullptr, &SB_SetLayout) != VK_SUCCESS) {
+		if (vkCreateDescriptorSetLayout(device, &sb_discriptor_create_info, nullptr, &SB_SetLayout) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create descriptor set layout!");
 		}
 
@@ -388,11 +387,11 @@ public:
 		sb_discriptor_pool_create_info.poolSizeCount = 1;
 		sb_discriptor_pool_create_info.pPoolSizes = &discriptor_pool_size;
 
-		if(vkCreateDescriptorPool(device, &sb_discriptor_pool_create_info, nullptr, &SB_DescriptorPool) != VK_SUCCESS) {
+		if (vkCreateDescriptorPool(device, &sb_discriptor_pool_create_info, nullptr, &SB_DescriptorPool) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create descriptor pool!");
 		}
-			// TODO: Part 4f
-		// TODO: Part 2g
+		// TODO: Part 4f
+	// TODO: Part 2g
 		VkDescriptorSetAllocateInfo sb_set_alloc_info = {};
 		sb_set_alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		sb_set_alloc_info.pSetLayouts = &SB_SetLayout;
@@ -403,8 +402,8 @@ public:
 		if (vkAllocateDescriptorSets(device, &sb_set_alloc_info, &SB_DescriptorSet) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
-			// TODO: Part 4f
-		// TODO: Part 2h
+		// TODO: Part 4f
+	// TODO: Part 2h
 		VkDescriptorBufferInfo sb_descriptor_buffer_info{};
 		for (int i = 0; i < SB_Handle.size(); i++) {
 			sb_descriptor_buffer_info.buffer = SB_Handle[i];
@@ -425,20 +424,25 @@ public:
 		sb_write_descriptor_set.dstArrayElement = 0;
 		vkUpdateDescriptorSets(device, 1, &sb_write_descriptor_set, 0, VK_NULL_HANDLE);
 
-			// TODO: Part 4f
-	
-		// Descriptor pipeline layout
+		// TODO: Part 4f
+
+		VkPushConstantRange push_constant_range = {};
+		push_constant_range.offset = 0;
+		push_constant_range.size = sizeof(unsigned int);
+		push_constant_range.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS;
+
+	// Descriptor pipeline layout
 		VkPipelineLayoutCreateInfo pipeline_layout_create_info = {};
 		pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		// TODO: Part 2e
 		pipeline_layout_create_info.setLayoutCount = 1;
 		pipeline_layout_create_info.pSetLayouts = &SB_SetLayout;
 		// TODO: Part 3c
-		pipeline_layout_create_info.pushConstantRangeCount = 0;
-		pipeline_layout_create_info.pPushConstantRanges = nullptr;
+		pipeline_layout_create_info.pushConstantRangeCount = 1;
+		pipeline_layout_create_info.pPushConstantRanges = &push_constant_range;
 		vkCreatePipelineLayout(device, &pipeline_layout_create_info, nullptr, &pipelineLayout);
 
-	    // Pipeline State... (FINALLY) 
+		// Pipeline State... (FINALLY) 
 		VkGraphicsPipelineCreateInfo pipeline_create_info = {};
 		pipeline_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 		pipeline_create_info.stageCount = 2;
@@ -463,7 +467,7 @@ public:
 			if (+shutdown.Find(GW::GRAPHICS::GVulkanSurface::Events::RELEASE_RESOURCES, true)) {
 				CleanUp(); // unlike D3D we must be careful about destroy timing
 			}
-		});
+			});
 	}
 	void Render()
 	{
@@ -484,13 +488,13 @@ public:
 		win.GetClientHeight(height);
 		// setup the pipeline's dynamic settings
 		VkViewport viewport = {
-            0, 0, static_cast<float>(width), static_cast<float>(height), 0, 1
-        };
-        VkRect2D scissor = { {0, 0}, {width, height} };
+			0, 0, static_cast<float>(width), static_cast<float>(height), 0, 1
+		};
+		VkRect2D scissor = { {0, 0}, {width, height} };
 		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-		
+
 		// now we can draw
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vertexHandle, offsets);
@@ -502,10 +506,11 @@ public:
 		// TODO: Part 3b
 			// TODO: Part 3d
 		for (int i = 0; i < FSLogo_meshcount; i++) {
+			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(unsigned int), &FSLogo_meshes[i].materialIndex);
 			vkCmdDrawIndexed(commandBuffer, FSLogo_meshes[i].indexCount, 1, FSLogo_meshes[i].indexOffset, 0, 0); // TODO: Part 1d, 1h
 		}
 	}
-	
+
 	std::string ShaderAsString(const char* shaderFilePath) {
 		std::string output;
 		unsigned int stringLength = 0;

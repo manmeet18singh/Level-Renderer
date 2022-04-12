@@ -1,6 +1,12 @@
 #pragma pack_matrix(row_major)
 #define MAX_SUBMESH_PER_DRAW 1024
 
+[[vk::push_constant]]
+cbuffer MESH_INDEX
+{
+    uint mesh_ID;
+};
+
 struct OBJ_ATTRIBUTES
 {
     float3 Kd; // diffuse reflectivity

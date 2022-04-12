@@ -1,6 +1,12 @@
 #pragma pack_matrix(row_major)
 #define MAX_SUBMESH_PER_DRAW 1024
 
+[[vk::push_constant]]
+cbuffer MESH_INDEX
+{
+    uint mesh_ID;
+};
+
 struct OBJ_ATTRIBUTES
 {
     float3 Kd; // diffuse reflectivity
@@ -42,9 +48,9 @@ struct PS_INPUT
 StructuredBuffer<SHADER_MODEL_DATA> SceneData;
 float4 main(PS_INPUT input) : SV_TARGET
 {
-    return float4(0.75f, 0.75f, 0.25f, 0); // TODO: Part 1a
+    //return float4(0.75f, 0.75f, 0.25f, 0); // TODO: Part 1a
 	// TODO: Part 3a
-    //return SceneData[0].materials[0];
+    return float4(SceneData[0].materials[mesh_ID].Kd, 1);
 	// TODO: Part 4c
 	// TODO: Part 4g (half-vector or reflect method your choice)
 }
