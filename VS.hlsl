@@ -51,7 +51,7 @@ PS_INPUT main(VS_INPUT input)
 {
     PS_INPUT output = (PS_INPUT) 0;
     output.Pos = float4(input.Pos, 1);
-    output.Norm = mul(input.Norm, (float3x3) SceneData[0].matricies[mesh_ID]);
+    output.Norm = mul(float4(input.Norm, 0), SceneData[0].matricies[mesh_ID]).xyz;
     output.Uvw = input.Uvw;
     
     output.Pos = mul(output.Pos, SceneData[0].matricies[mesh_ID]);

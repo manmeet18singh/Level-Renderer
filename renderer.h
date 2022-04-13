@@ -218,9 +218,9 @@ public:
 		vertex_binding_description.stride = sizeof(OBJ_VERT);
 		vertex_binding_description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 		VkVertexInputAttributeDescription vertex_attribute_description[3] = {
-			{ 0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(OBJ_VERT, pos) }, //uv, normal, etc....
-			{ 1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(OBJ_VERT, uvw) }, //uvw
-			{ 2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(OBJ_VERT, nrm) }, //norm
+			{ 0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0 }, //xyz
+			{ 1, 0, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 3}, //uvw
+			{ 2, 0, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 6}, //nrm
 		};
 		VkPipelineVertexInputStateCreateInfo input_vertex_info = {};
 		input_vertex_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;

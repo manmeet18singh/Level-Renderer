@@ -42,9 +42,9 @@ struct PS_INPUT
 StructuredBuffer<SHADER_MODEL_DATA> SceneData;
 float4 main(PS_INPUT input) : SV_TARGET
 {
-    float3 nrm = normalize(input.Norm);
+    input.Norm = normalize(input.Norm);
     
-    float lightRatio = clamp(dot(-SceneData[0].SunDirection.xyz, nrm), 0, 1);
+    float lightRatio = clamp(dot(-SceneData[0].SunDirection.xyz, input.Norm), 0, 1);
     
     //lightRatio += clamp(lightRatio + SceneData[0].SunAmbient, 0, 1);
     
@@ -59,5 +59,5 @@ float4 main(PS_INPUT input) : SV_TARGET
     //float3 reflectedLight = SceneData[0].SunColor.xyz * SceneData[0].materials[mesh_ID].Ks * intensity;
 
     //finalLight += reflectedLight;
-    return float4(finalLight, 1);
+    return saturate(float4(input.Norm, 0));
 }
