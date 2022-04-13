@@ -1,76 +1,12 @@
 // minimalistic code to draw a single triangle, this is not part of the API.
 // TODO: Part 1b
+#include "XTime.h"
 #include "Assets/FSLogo.h"
 #include "shaderc/shaderc.h" // needed for compiling shaders at runtime
 #ifdef _WIN32 // must use MT platform DLL libraries on windows
 #pragma comment(lib, "shaderc_combined.lib") 
 #endif
-//// Simple Vertex Shader
-//const char* vertexShaderSource = R"(
-//// TODO: 2i
-//// an ultra simple hlsl vertex shader
-//// TODO: Part 2b
-//// TODO: Part 4g
-//// TODO: Part 2i
-//// TODO: Part 3e
-//// TODO: Part 4a
-//// TODO: Part 1f
-//
-////[[vk::push_constant]] 
-////cbuffer SHADER_VARS
-////{
-////    matrix World;
-////    matrix View;
-////    //matrix Projection;
-////}
-//
-//struct VS_INPUT
-//{
-//    float4 Pos : POSITION;
-//    float3 Norm : NORMAL;
-//    float2 Tex : TEXCOORD0;
-//};
-//
-//struct PS_INPUT
-//{
-//    float4 Pos : SV_POSITION;
-//    float3 Norm : NORMAL;
-//    float2 Tex : TEXCOORD1;
-//};
-//// TODO: Part 4b
-//
-//PS_INPUT main(VS_INPUT input)
-//{
-//    PS_INPUT output = (PS_INPUT) 0;
-//   /* output.Pos = mul(input.Pos, World);
-//    output.Pos = mul(output.Pos, View);
-//    output.Pos = mul(output.Pos, Projection);
-//    output.Norm = mul(input.Norm, (float3x3) World);
-//    output.Tex = input.Tex;*/
-//
-//	output.Pos = input.Pos;
-//	output.Norm = input.Norm;
-//	output.Tex = input.Tex;
-//
-//    return output;
-//}
-//)";
-//// Simple Pixel Shader
-//const char* pixelShaderSource = R"(
-//// TODO: Part 2b
-//// TODO: Part 4g
-//// TODO: Part 2i
-//// TODO: Part 3e
-//// an ultra simple hlsl pixel shader
-//// TODO: Part 4b
-//float4 main() : SV_TARGET 
-//{	
-//	return float4(0.75f ,0.75f, 0.25f, 0); // TODO: Part 1a
-//	// TODO: Part 3a
-//	// TODO: Part 4c
-//	// TODO: Part 4g (half-vector or reflect method your choice)
-//}
-//)";
+
 // Creation, Rendering & Cleanup
 class Renderer
 {
@@ -78,7 +14,7 @@ class Renderer
 #define MAX_SUBMESH_PER_DRAW 1024
 	struct SHADER_MODEL_DATA
 	{
-		GW::MATH::GVECTORF SunDirection, SunColor;
+		GW::MATH::GVECTORF SunDirection, SunColor, SunAmbient, CamPos;
 		GW::MATH::GMATRIXF ViewMatrix, ProjectionMatrix;
 
 		GW::MATH::GMATRIXF matricies[MAX_SUBMESH_PER_DRAW];
@@ -89,6 +25,8 @@ class Renderer
 	GW::SYSTEM::GWindow win;
 	GW::GRAPHICS::GVulkanSurface vlk;
 	GW::CORE::GEventReceiver shutdown;
+
+	XTime timer;
 
 	// what we need at a minimum to draw a triangle
 	VkDevice device = nullptr;
@@ -111,17 +49,19 @@ class Renderer
 	// TODO: Part 2f
 	VkDescriptorPool SB_DescriptorPool;
 	// TODO: Part 2g
-	VkDescriptorSet SB_DescriptorSet;
+	std::vector<VkDescriptorSet> SB_DescriptorSet;
 	// TODO: Part 4f
 
 // TODO: Part 2a
 	GW::MATH::GMATRIXF MATRIX_World;
 	GW::MATH::GMatrix PROXY_matrix;
+	GW::MATH::GVector PROXY_vector;
 
 	GW::MATH::GMATRIXF MATRIX_View;
 	GW::MATH::GMATRIXF MATRIX_Projection;
 	GW::MATH::GVECTORF VECTOR_Light_Direction;
 	GW::MATH::GVECTORF VECTOR_Light_Color;
+	GW::MATH::GVECTORF VECTOR_Ambient;
 
 	// TODO: Part 2b
 	SHADER_MODEL_DATA shader_model_data;
@@ -136,10 +76,12 @@ public:
 		win.GetClientWidth(width);
 		win.GetClientHeight(height);
 		// TODO: Part 2a
+		timer = XTime();
+		timer.Restart();
 		PROXY_matrix.Create();
+		PROXY_vector.Create();
 
 		//TODO ROTATE ON Y OVER TIME
-		//PROXY_matrix.RotateYGlobalF(GW::MATH::GIdentityMatrixF, 1.5708, MATRIX_World);
 
 		GW::MATH::GVECTORF Eye = { 0.75f, 0.25, -1.5f };
 		GW::MATH::GVECTORF At = { 0.15f, 0.75f, 0.0f };
@@ -153,7 +95,7 @@ public:
 		PROXY_matrix.ProjectionVulkanLHF(G_DEGREE_TO_RADIAN(65), aspect, 0.1f, 100.0f, MATRIX_Projection);
 
 		GW::MATH::GVECTORF lightDir = { -1.0f, -1.0f, 2.0f };
-		GW::MATH::GVector::NormalizeF(lightDir, VECTOR_Light_Direction);
+		PROXY_vector.NormalizeF(lightDir, VECTOR_Light_Direction);
 
 		VECTOR_Light_Color = { 0.9f, 0.9f, 1.0f, 1.0f };
 
@@ -164,10 +106,13 @@ public:
 		shader_model_data.SunColor = VECTOR_Light_Color;
 		shader_model_data.SunDirection = VECTOR_Light_Direction;
 
-		//shader_model_data.matricies[0] = MATRIX_World;
 		shader_model_data.matricies[0] = GW::MATH::GIdentityMatrixF;
 
 		// TODO: Part 4g
+		shader_model_data.CamPos = Eye;
+
+		VECTOR_Ambient = {0.25f, 0.25f, 0.35f, 1.0f};
+		shader_model_data.SunAmbient = VECTOR_Ambient;
 		// TODO: part 3b
 
 		for (int i = 0; i < FSLogo_materialcount; i++)
@@ -183,7 +128,7 @@ public:
 
 		// TODO: Part 1c
 		// Create Vertex Buffer
-		//float verts[] = FSLogo_vertices;
+
 		// Transfer triangle data to the vertex buffer. (staging would be prefered here)
 		GvkHelper::create_buffer(physicalDevice, device, sizeof(FSLogo_vertices),
 			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
@@ -200,6 +145,7 @@ public:
 		vlk.GetSwapchainImageCount(max_active_frames);
 		SB_Handle.resize(max_active_frames);
 		SB_Data.resize(max_active_frames);
+		SB_DescriptorSet.resize(max_active_frames);
 
 		for (int i = 0; i < max_active_frames; i++)
 		{
@@ -399,31 +345,36 @@ public:
 		sb_set_alloc_info.descriptorSetCount = 1;
 		sb_set_alloc_info.descriptorPool = SB_DescriptorPool;
 
-		if (vkAllocateDescriptorSets(device, &sb_set_alloc_info, &SB_DescriptorSet) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
+		for (int i = 0; i < max_active_frames; i++)
+		{
+			if (vkAllocateDescriptorSets(device, &sb_set_alloc_info, &SB_DescriptorSet[i]) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
 		}
+
 		// TODO: Part 4f
 	// TODO: Part 2h
-		VkDescriptorBufferInfo sb_descriptor_buffer_info{};
-		for (int i = 0; i < SB_Handle.size(); i++) {
-			sb_descriptor_buffer_info.buffer = SB_Handle[i];
-			sb_descriptor_buffer_info.offset = 0;
-			sb_descriptor_buffer_info.range = VK_WHOLE_SIZE;
+		std::vector <VkDescriptorBufferInfo> sb_descriptor_buffer_info(max_active_frames);
+		for (int i = 0; i < max_active_frames; i++) {
+			sb_descriptor_buffer_info[i].buffer = SB_Handle[i];
+			sb_descriptor_buffer_info[i].offset = 0;
+			sb_descriptor_buffer_info[i].range = VK_WHOLE_SIZE;
 		}
 
-		VkWriteDescriptorSet sb_write_descriptor_set = {};
-		sb_write_descriptor_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		sb_write_descriptor_set.pNext = VK_NULL_HANDLE;
-		sb_write_descriptor_set.pTexelBufferView = VK_NULL_HANDLE;
-		sb_write_descriptor_set.dstSet = SB_DescriptorSet;
-		sb_write_descriptor_set.pBufferInfo = &sb_descriptor_buffer_info;
-		sb_write_descriptor_set.pImageInfo = VK_NULL_HANDLE;
-		sb_write_descriptor_set.dstBinding = 0;
-		sb_write_descriptor_set.descriptorCount = 1;
-		sb_write_descriptor_set.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		sb_write_descriptor_set.dstArrayElement = 0;
-		vkUpdateDescriptorSets(device, 1, &sb_write_descriptor_set, 0, VK_NULL_HANDLE);
-
+		std::vector <VkWriteDescriptorSet> sb_write_descriptor_set(max_active_frames);
+		for (int i = 0; i < max_active_frames; i++) {
+			sb_write_descriptor_set[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			sb_write_descriptor_set[i].pNext = VK_NULL_HANDLE;
+			sb_write_descriptor_set[i].pTexelBufferView = VK_NULL_HANDLE;
+			sb_write_descriptor_set[i].dstSet = SB_DescriptorSet[i];
+			sb_write_descriptor_set[i].pBufferInfo = &sb_descriptor_buffer_info[i];
+			sb_write_descriptor_set[i].pImageInfo = VK_NULL_HANDLE;
+			sb_write_descriptor_set[i].dstBinding = 0;
+			sb_write_descriptor_set[i].descriptorCount = 1;
+			sb_write_descriptor_set[i].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+			sb_write_descriptor_set[i].dstArrayElement = 0;
+			vkUpdateDescriptorSets(device, 1, &sb_write_descriptor_set[i], 0, VK_NULL_HANDLE);
+		}
 		// TODO: Part 4f
 
 		VkPushConstantRange push_constant_range = {};
@@ -431,7 +382,7 @@ public:
 		push_constant_range.size = sizeof(unsigned int);
 		push_constant_range.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS;
 
-	// Descriptor pipeline layout
+		// Descriptor pipeline layout
 		VkPipelineLayoutCreateInfo pipeline_layout_create_info = {};
 		pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		// TODO: Part 2e
@@ -472,11 +423,14 @@ public:
 	void Render()
 	{
 		// TODO: Part 2a
-
+		timer.Signal();
+		PROXY_matrix.RotateYGlobalF(GW::MATH::GIdentityMatrixF, timer.TotalTime(), MATRIX_World);
 
 		// TODO: Part 3b
 
 		// TODO: Part 4d
+		shader_model_data.matricies[1] = MATRIX_World;
+
 		// grab the current Vulkan commandBuffer
 		unsigned int currentBuffer;
 		vlk.GetSwapchainCurrentImage(currentBuffer);
@@ -501,8 +455,9 @@ public:
 		// TODO: Part 1h
 		vkCmdBindIndexBuffer(commandBuffer, indexHandle, *offsets, VK_INDEX_TYPE_UINT32);
 		// TODO: Part 4d
+		GvkHelper::write_to_buffer(device, SB_Data[currentBuffer], &shader_model_data, sizeof(shader_model_data));
 		// TODO: Part 2i
-		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &SB_DescriptorSet, 0, VK_NULL_HANDLE);
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &SB_DescriptorSet[currentBuffer], 0, VK_NULL_HANDLE);
 		// TODO: Part 3b
 			// TODO: Part 3d
 		for (int i = 0; i < FSLogo_meshcount; i++) {

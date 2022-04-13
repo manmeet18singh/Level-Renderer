@@ -4,9 +4,15 @@
     <ClCompile Include="C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="XTime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XTime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

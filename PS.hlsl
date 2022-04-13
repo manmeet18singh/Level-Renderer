@@ -23,18 +23,11 @@ struct OBJ_ATTRIBUTES
 
 struct SHADER_MODEL_DATA
 {
-    float4 SunDirection, SunColor;
+    float4 SunDirection, SunColor, SunAmbient, CamPos;
     matrix ViewMatrix, ProjectionMatrix;
 
     matrix matricies[MAX_SUBMESH_PER_DRAW];
     OBJ_ATTRIBUTES materials[MAX_SUBMESH_PER_DRAW];
-};
-
-struct VS_INPUT
-{
-    float3 Pos : POSITION;
-    float3 Norm : NORMAL;
-    float3 Uvw : TEXCOORD;
 };
 
 struct PS_INPUT
@@ -42,15 +35,29 @@ struct PS_INPUT
     float4 Pos : SV_POSITION;
     float3 Norm : NORMAL;
     float3 Uvw : TEXCOORD;
+    float3 PosW : WORLD;
 };
 // TODO: Part 4b
 
 StructuredBuffer<SHADER_MODEL_DATA> SceneData;
 float4 main(PS_INPUT input) : SV_TARGET
 {
-    //return float4(0.75f, 0.75f, 0.25f, 0); // TODO: Part 1a
+    float3 nrm = normalize(input.Norm);
+    
+    float lightRatio = clamp(dot(-SceneData[0].SunDirection.xyz, nrm), 0, 1);
+    
+    //lightRatio += clamp(lightRatio + SceneData[0].SunAmbient, 0, 1);
+    
 	// TODO: Part 3a
-    return float4(SceneData[0].materials[mesh_ID].Kd, 1);
 	// TODO: Part 4c
-	// TODO: Part 4g (half-vector or reflect method your choice)
+    float3 finalLight = lightRatio * SceneData[0].SunColor.xyz * SceneData[0].materials[mesh_ID].Kd;
+    
+	// TODO: Part 4g (half-vector or reflect method your choice)  
+    //float3 viewDir = normalize(SceneData[0].CamPos.xyz - input.PosW.xyz);
+    //float3 halfVector = normalize((-SceneData[0].SunDirection.xyz) + viewDir);
+    //float intensity = max(pow(clamp(dot(nrm, halfVector), 0, 1), SceneData[0].materials[mesh_ID].Ns), 0);
+    //float3 reflectedLight = SceneData[0].SunColor.xyz * SceneData[0].materials[mesh_ID].Ks * intensity;
+
+    //finalLight += reflectedLight;
+    return float4(finalLight, 1);
 }

@@ -23,7 +23,7 @@ struct OBJ_ATTRIBUTES
 
 struct SHADER_MODEL_DATA
 {
-    float4 SunDirection, SunColor;
+    float4 SunDirection, SunColor, SunAmbient, CamPos;
     matrix ViewMatrix, ProjectionMatrix;
 
     matrix matricies[MAX_SUBMESH_PER_DRAW];
@@ -42,6 +42,7 @@ struct PS_INPUT
     float4 Pos : SV_POSITION;
     float3 Norm : NORMAL;
     float3 Uvw : TEXCOORD;
+    float3 PosW : WORLD;
 };
 // TODO: Part 4b
 
@@ -50,10 +51,12 @@ PS_INPUT main(VS_INPUT input)
 {
     PS_INPUT output = (PS_INPUT) 0;
     output.Pos = float4(input.Pos, 1);
-    output.Norm = input.Norm;
+    output.Norm = mul(input.Norm, (float3x3) SceneData[0].matricies[mesh_ID]);
     output.Uvw = input.Uvw;
     
-    output.Pos = mul(output.Pos, SceneData[0].matricies[0]);
+    output.Pos = mul(output.Pos, SceneData[0].matricies[mesh_ID]);
+    output.PosW = output.Pos.xyz;
+    
     output.Pos = mul(output.Pos, SceneData[0].ViewMatrix);
     output.Pos = mul(output.Pos, SceneData[0].ProjectionMatrix);
 
