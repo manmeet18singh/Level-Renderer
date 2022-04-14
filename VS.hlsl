@@ -33,15 +33,15 @@ struct SHADER_MODEL_DATA
 struct VS_INPUT
 {
     float3 Pos : POSITION;
-    float3 Norm : NORMAL;
     float3 Uvw : TEXCOORD;
+    float3 Norm : NORMAL;
 };
 
 struct PS_INPUT
 {
     float4 Pos : SV_POSITION;
-    float3 Norm : NORMAL;
     float3 Uvw : TEXCOORD;
+    float3 Norm : NORMAL;
     float3 PosW : WORLD;
 };
 // TODO: Part 4b
