@@ -7,12 +7,24 @@
     <ClCompile Include="XTime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="XTime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\FSLogo.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="GW_Defines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h2bParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -28,6 +40,9 @@
     </Filter>
     <Filter Include="Shader Files">
       <UniqueIdentifier>{35278a18-26ca-448b-a2fa-a4aea1cb4830}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{99519575-5468-4770-a7de-da08b54b90b2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
