@@ -443,7 +443,7 @@ void Renderer::UpdateCamera() {
 	float KEY_mouse_x = 0;
 	float KEY_mouse_y = 0;
 
-	const float Camera_Speed = 0.3f;
+	const float Camera_Speed = 0.9f;
 	float Seconds_Passed_Since_Last_Frame = timer.Delta();
 
 	unsigned int width, height;
