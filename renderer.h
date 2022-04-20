@@ -1,7 +1,7 @@
 // TODO: Part 1b
 #include "GW_Defines.h"
 #include "XTime.h"
-#include "Assets/FSLogo.h"
+#include "Assets/FSLogo/FSLogo.h"
 #include "shaderc/shaderc.h" // needed for compiling shaders at runtime
 #include "Gateware/Gateware.h"
 #include "vulkan/vulkan_core.h"
