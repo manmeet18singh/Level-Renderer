@@ -316,9 +316,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\main.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="XTime.cpp" />
-    <ClInclude Include="Assets\FSLogo.h" />
+    <ClInclude Include="Assets\FSLogo\FSLogo.h" />
     <ClInclude Include="C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\renderer.h" />
-    <ClInclude Include="GW_Defines.h" />
+    <ClInclude Include="defines.h" />
     <ClInclude Include="h2bParser.h" />
     <ClInclude Include="XTime.h" />
   </ItemGroup>

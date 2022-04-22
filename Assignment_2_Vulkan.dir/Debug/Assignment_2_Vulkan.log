@@ -1,76 +1,4 @@
-﻿  main.cpp
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(14691,3): warning C4250: 'GW::I::GWindowImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Register' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4724): message : see declaration of 'GW::I::GEventGeneratorImplementation::Register'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(14691,3): warning C4250: 'GW::I::GWindowImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Deregister' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4737): message : see declaration of 'GW::I::GEventGeneratorImplementation::Deregister'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(14691,3): warning C4250: 'GW::I::GWindowImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Observers' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4760): message : see declaration of 'GW::I::GEventGeneratorImplementation::Observers'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(14691,3): warning C4250: 'GW::I::GWindowImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Push' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4768): message : see declaration of 'GW::I::GEventGeneratorImplementation::Push'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(59715,3): warning C4250: 'GW::I::GRasterSurfaceImplementation': inherits 'GW::I::GEventResponderImplementation::GW::I::GEventResponderImplementation::Assign' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4073): message : see declaration of 'GW::I::GEventResponderImplementation::Assign'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(59715,3): warning C4250: 'GW::I::GRasterSurfaceImplementation': inherits 'GW::I::GEventResponderImplementation::GW::I::GEventResponderImplementation::Invoke' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4082): message : see declaration of 'GW::I::GEventResponderImplementation::Invoke'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(63880,9): warning C4250: 'GW::I::GVulkanSurfaceImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Register' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4724): message : see declaration of 'GW::I::GEventGeneratorImplementation::Register'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(63880,9): warning C4250: 'GW::I::GVulkanSurfaceImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Deregister' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4737): message : see declaration of 'GW::I::GEventGeneratorImplementation::Deregister'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(63880,9): warning C4250: 'GW::I::GVulkanSurfaceImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Observers' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4760): message : see declaration of 'GW::I::GEventGeneratorImplementation::Observers'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(63880,9): warning C4250: 'GW::I::GVulkanSurfaceImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Push' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4768): message : see declaration of 'GW::I::GEventGeneratorImplementation::Push'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64083,9): warning C4250: 'GW::I::GAudioImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Register' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4724): message : see declaration of 'GW::I::GEventGeneratorImplementation::Register'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64083,9): warning C4250: 'GW::I::GAudioImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Deregister' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4737): message : see declaration of 'GW::I::GEventGeneratorImplementation::Deregister'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64083,9): warning C4250: 'GW::I::GAudioImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Observers' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4760): message : see declaration of 'GW::I::GEventGeneratorImplementation::Observers'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64083,9): warning C4250: 'GW::I::GAudioImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Push' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4768): message : see declaration of 'GW::I::GEventGeneratorImplementation::Push'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Register' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4724): message : see declaration of 'GW::I::GEventGeneratorImplementation::Register'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Deregister' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4737): message : see declaration of 'GW::I::GEventGeneratorImplementation::Deregister'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Observers' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4760): message : see declaration of 'GW::I::GEventGeneratorImplementation::Observers'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Push' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4768): message : see declaration of 'GW::I::GEventGeneratorImplementation::Push'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GAudioImplementation::GW::I::GAudioImplementation::SetMasterVolume' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64031): message : see declaration of 'GW::I::GAudioImplementation::SetMasterVolume'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GAudioImplementation::GW::I::GAudioImplementation::SetGlobalSoundVolume' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64035): message : see declaration of 'GW::I::GAudioImplementation::SetGlobalSoundVolume'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GAudioImplementation::GW::I::GAudioImplementation::SetGlobalMusicVolume' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64039): message : see declaration of 'GW::I::GAudioImplementation::SetGlobalMusicVolume'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GAudioImplementation::GW::I::GAudioImplementation::SetSoundsChannelVolumes' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64043): message : see declaration of 'GW::I::GAudioImplementation::SetSoundsChannelVolumes'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GAudioImplementation::GW::I::GAudioImplementation::SetMusicChannelVolumes' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64047): message : see declaration of 'GW::I::GAudioImplementation::SetMusicChannelVolumes'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GAudioImplementation::GW::I::GAudioImplementation::PlaySounds' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64051): message : see declaration of 'GW::I::GAudioImplementation::PlaySounds'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GAudioImplementation::GW::I::GAudioImplementation::PauseSounds' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64055): message : see declaration of 'GW::I::GAudioImplementation::PauseSounds'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GAudioImplementation::GW::I::GAudioImplementation::ResumeSounds' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64059): message : see declaration of 'GW::I::GAudioImplementation::ResumeSounds'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GAudioImplementation::GW::I::GAudioImplementation::StopSounds' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64063): message : see declaration of 'GW::I::GAudioImplementation::StopSounds'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GAudioImplementation::GW::I::GAudioImplementation::PlayMusic' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64067): message : see declaration of 'GW::I::GAudioImplementation::PlayMusic'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GAudioImplementation::GW::I::GAudioImplementation::PauseMusic' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64071): message : see declaration of 'GW::I::GAudioImplementation::PauseMusic'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GAudioImplementation::GW::I::GAudioImplementation::ResumeMusic' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64075): message : see declaration of 'GW::I::GAudioImplementation::ResumeMusic'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3): warning C4250: 'GW::I::GAudio3DImplementation': inherits 'GW::I::GAudioImplementation::GW::I::GAudioImplementation::StopMusic' via dominance
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64079): message : see declaration of 'GW::I::GAudioImplementation::StopMusic'
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(1496,1): warning C4244: 'argument': conversion from '_Ty' to 'unsigned int', possible loss of data
-          with
-          [
-              _Ty=unsigned __int64
-          ]
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(1597): message : see reference to function template instantiation 'GW::GReturn GW::I::GProxy<GW::I::GVulkanSurfaceInterface,GW::I::GVulkanSurfaceImplementation,GW::SYSTEM::GWindow,unsigned __int64>::allocate<GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char**,int,nullptr,int,nullptr,bool>(GW::SYSTEM::GWindow &&,GW::GRAPHICS::GGraphicsInitOptions &&,unsigned __int64 &&,const char **&&,int &&,nullptr &&,int &&,nullptr &&,bool &&)' being compiled
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(1597): message : see reference to function template instantiation 'GW::GReturn GW::I::GProxy<GW::I::GVulkanSurfaceInterface,GW::I::GVulkanSurfaceImplementation,GW::SYSTEM::GWindow,unsigned __int64>::allocate<GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char**,int,nullptr,int,nullptr,bool>(GW::SYSTEM::GWindow &&,GW::GRAPHICS::GGraphicsInitOptions &&,unsigned __int64 &&,const char **&&,int &&,nullptr &&,int &&,nullptr &&,bool &&)' being compiled
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\main.cpp(37): message : see reference to function template instantiation 'GW::GReturn GW::I::GProxy<GW::I::GVulkanSurfaceInterface,GW::I::GVulkanSurfaceImplementation,GW::SYSTEM::GWindow,unsigned __int64>::Create<GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char**,int,nullptr,int,nullptr,bool,std::enable_if<true,void>>(GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char **,int,nullptr,int,nullptr,bool)' being compiled
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\main.cpp(35): message : see reference to function template instantiation 'GW::GReturn GW::I::GProxy<GW::I::GVulkanSurfaceInterface,GW::I::GVulkanSurfaceImplementation,GW::SYSTEM::GWindow,unsigned __int64>::Create<GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char**,int,nullptr,int,nullptr,bool,std::enable_if<true,void>>(GW::SYSTEM::GWindow,GW::GRAPHICS::GGraphicsInitOptions,unsigned __int64,const char **,int,nullptr,int,nullptr,bool)' being compiled
-  renderer.cpp
+﻿  renderer.cpp
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(14691,3): warning C4250: 'GW::I::GWindowImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Register' via dominance
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(4724): message : see declaration of 'GW::I::GEventGeneratorImplementation::Register'
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(14691,3): warning C4250: 'GW::I::GWindowImplementation': inherits 'GW::I::GEventGeneratorImplementation::GW::I::GEventGeneratorImplementation::Deregister' via dominance
@@ -135,31 +63,35 @@ C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(65019,3
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64079): message : see declaration of 'GW::I::GAudioImplementation::StopMusic'
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\h2bParser.h(81,22): warning C4018: '<': signed/unsigned mismatch
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\h2bParser.h(96,22): warning C4018: '<': signed/unsigned mismatch
-renderer.cpp(93,20): warning C4018: '<': signed/unsigned mismatch
-renderer.cpp(297,20): warning C4018: '<': signed/unsigned mismatch
-renderer.cpp(307,20): warning C4018: '<': signed/unsigned mismatch
-renderer.cpp(314,20): warning C4018: '<': signed/unsigned mismatch
-renderer.cpp(447,40): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-renderer.cpp(489,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-renderer.cpp(491,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-renderer.cpp(496,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\defines.h(4,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+renderer.cpp(87,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+renderer.cpp(92,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+renderer.cpp(101,20): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(305,20): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(315,20): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(322,20): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(425,22): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(459,40): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+renderer.cpp(501,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+renderer.cpp(503,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+renderer.cpp(508,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+renderer.cpp(569,22): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(16886,4): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
           with
           [
               _Ty=double
           ]
-renderer.cpp(39): message : see reference to function template instantiation 'GW::GReturn GW::MATH::GMatrix::ProjectionVulkanLHF<double,float&,float,float,GW::MATH::GMATRIXF&>(double &&,float &,float &&,float &&,GW::MATH::GMATRIXF &)' being compiled
+renderer.cpp(46): message : see reference to function template instantiation 'GW::GReturn GW::MATH::GMatrix::ProjectionVulkanLHF<double,float&,float,float,GW::MATH::GMATRIXF&>(double &&,float &,float &&,float &&,GW::MATH::GMATRIXF &)' being compiled
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(16873,4): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
           with
           [
               _Ty=double
           ]
-renderer.cpp(378): message : see reference to function template instantiation 'GW::GReturn GW::MATH::GMatrix::RotateYGlobalF<const GW::MATH::GMATRIXF&,double,GW::MATH::GMATRIXF&>(const GW::MATH::GMATRIXF &,double &&,GW::MATH::GMATRIXF &)' being compiled
+renderer.cpp(386): message : see reference to function template instantiation 'GW::GReturn GW::MATH::GMatrix::RotateYGlobalF<const GW::MATH::GMATRIXF&,double,GW::MATH::GMATRIXF&>(const GW::MATH::GMATRIXF &,double &&,GW::MATH::GMATRIXF &)' being compiled
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(16877,4): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
           with
           [
               _Ty=int
           ]
-renderer.cpp(493): message : see reference to function template instantiation 'GW::GReturn GW::MATH::GMatrix::RotationYawPitchRollF<int,float&,int,GW::MATH::GMATRIXF&>(int &&,float &,int &&,GW::MATH::GMATRIXF &)' being compiled
-  Generating Code...
+renderer.cpp(505): message : see reference to function template instantiation 'GW::GReturn GW::MATH::GMatrix::RotationYawPitchRollF<int,float&,int,GW::MATH::GMATRIXF&>(int &&,float &,int &&,GW::MATH::GMATRIXF &)' being compiled
   Assignment_2_Vulkan.vcxproj -> C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Debug\Assignment_2_Vulkan.exe

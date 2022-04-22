@@ -1,11 +1,25 @@
 // TODO: Part 1b
-#include "GW_Defines.h"
+// With what we want & what we don't defined we can include the API
+// Simple basecode showing how to create a window and attatch a vulkansurface
+#define GATEWARE_ENABLE_CORE // All libraries need this
+#define GATEWARE_ENABLE_SYSTEM // Graphics libs require system level libraries
+#define GATEWARE_ENABLE_GRAPHICS // Enables all Graphics Libraries
+#define GATEWARE_ENABLE_MATH // Enables all Math
+// TODO: Part 3a
+#define GATEWARE_ENABLE_INPUT
+// Ignore some GRAPHICS libraries we aren't going to use
+#define GATEWARE_DISABLE_GDIRECTX11SURFACE // we have another template for this
+#define GATEWARE_DISABLE_GDIRECTX12SURFACE // we have another template for this
+#define GATEWARE_DISABLE_GRASTERSURFACE // we have another template for this
+#define GATEWARE_DISABLE_GOPENGLSURFACE // we have another template for this
 #include "XTime.h"
-#include "Assets/FSLogo/FSLogo.h"
 #include "shaderc/shaderc.h" // needed for compiling shaders at runtime
 #include "Gateware/Gateware.h"
 #include "vulkan/vulkan_core.h"
+#include "defines.h"
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 
 #ifdef _WIN32 // must use MT platform DLL libraries on windows
@@ -24,7 +38,7 @@ class Renderer
 		GW::MATH::GMATRIXF ViewMatrix, ProjectionMatrix;
 
 		GW::MATH::GMATRIXF matricies[MAX_SUBMESH_PER_DRAW];
-		OBJ_ATTRIBUTES materials[MAX_SUBMESH_PER_DRAW];
+		H2B::ATTRIBUTES materials[MAX_SUBMESH_PER_DRAW];
 	};
 
 	// proxy handles
@@ -33,6 +47,9 @@ class Renderer
 	GW::CORE::GEventReceiver shutdown;
 
 	XTime timer;
+
+	//Save all the models into this list
+	std::vector<GAMEOBJECT> List_Of_Game_Objects;
 
 	// what we need at a minimum to draw a triangle
 	VkDevice device = nullptr;
@@ -90,4 +107,6 @@ private:
 	void InitShader();
 	void InitPipeline(unsigned int width, unsigned int height);
 	void Shutdown();
+	void ReadGameLevelFile(const char* file);
+	void LoadGameLevel();
 };

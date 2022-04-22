@@ -18,14 +18,14 @@
     <ClInclude Include="XTime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Assets\FSLogo.h">
-      <Filter>Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="GW_Defines.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="h2bParser.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="defines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\FSLogo\FSLogo.h">
+      <Filter>Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

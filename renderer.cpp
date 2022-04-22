@@ -1,5 +1,8 @@
 #include "renderer.h"
 #include "h2bParser.h"
+//#include "Assets/FSLogo/FSLogo.h"
+#include <iostream>
+#include <fstream>
 
 Renderer::Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GVulkanSurface _vlk)
 {
@@ -16,6 +19,10 @@ Renderer::Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GVulkanSurface _vlk)
 	PROXY_vector.Create();
 	PROXY_input.Create(win);
 	PROXY_controller.Create();
+
+	//Load in default level
+	ReadGameLevelFile("Assets/1Model.txt");
+	LoadGameLevel();
 
 	InitContent();
 	InitShader();
@@ -50,8 +57,6 @@ void Renderer::InitContent()
 	shader_model_data.SunColor = VECTOR_Light_Color;
 	shader_model_data.SunDirection = VECTOR_Light_Direction;
 
-	shader_model_data.matricies[0] = GW::MATH::GIdentityMatrixF;
-
 	// TODO: Part 4g
 	shader_model_data.CamPos = Eye;
 
@@ -59,9 +64,9 @@ void Renderer::InitContent()
 	shader_model_data.SunAmbient = VECTOR_Ambient;
 	// TODO: part 3b
 
-	for (int i = 0; i < FSLogo_materialcount; i++)
+	for (int i = 0; i < List_Of_Game_Objects.size(); i++)
 	{
-		shader_model_data.materials[i] = FSLogo_materials[i].attrib;
+		//shader_model_data.materials[i] = FSLogo_materials[i].attrib;
 	}
 
 	/***************** GEOMETRY INTIALIZATION ******************/
@@ -73,16 +78,19 @@ void Renderer::InitContent()
 	// TODO: Part 1c
 	// Create Vertex Buffer
 
-	// Transfer triangle data to the vertex buffer. (staging would be prefered here)
-	GvkHelper::create_buffer(physicalDevice, device, sizeof(FSLogo_vertices),
-		VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-		VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexHandle, &vertexData);
-	GvkHelper::write_to_buffer(device, vertexData, FSLogo_vertices, sizeof(FSLogo_vertices));
-	// TODO: Part 1g
-	GvkHelper::create_buffer(physicalDevice, device, sizeof(FSLogo_indices),
-		VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-		VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexHandle, &indexData);
-	GvkHelper::write_to_buffer(device, indexData, FSLogo_indices, sizeof(FSLogo_indices));
+	for each (GAMEOBJECT savedObj in List_Of_Game_Objects)
+	{
+		// Transfer triangle data to the vertex buffer. (staging would be prefered here)
+		GvkHelper::create_buffer(physicalDevice, device, sizeof(H2B::VERTEX) * savedObj.vertices.size(),
+			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexHandle, &vertexData);
+		GvkHelper::write_to_buffer(device, vertexData, savedObj.vertices.data(), sizeof(H2B::VERTEX) * savedObj.vertices.size());
+		// TODO: Part 1g
+		GvkHelper::create_buffer(physicalDevice, device, sizeof(int) * savedObj.indices.size(),
+			VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexHandle, &indexData);
+		GvkHelper::write_to_buffer(device, indexData, savedObj.indices.data(), sizeof(int) * savedObj.indices.size());
+	}
 
 	// TODO: Part 2d
 	vlk.GetSwapchainImageCount(max_active_frames);
@@ -164,7 +172,7 @@ void Renderer::InitPipeline(unsigned int width, unsigned int height)
 	// Vertex Input State
 	VkVertexInputBindingDescription vertex_binding_description = {};
 	vertex_binding_description.binding = 0;
-	vertex_binding_description.stride = sizeof(OBJ_VERT);
+	vertex_binding_description.stride = sizeof(H2B::VERTEX);
 	vertex_binding_description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 	VkVertexInputAttributeDescription vertex_attribute_description[3] = {
 		{ 0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0 }, //xyz
@@ -412,10 +420,14 @@ void Renderer::Render() {
 		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &SB_DescriptorSet[currentBuffer], 0, VK_NULL_HANDLE);
 		// TODO: Part 3b
 			// TODO: Part 3d
-		for (int i = 0; i < FSLogo_meshcount; i++) {
-			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(unsigned int), &FSLogo_meshes[i].materialIndex);
-			vkCmdDrawIndexed(commandBuffer, FSLogo_meshes[i].indexCount, 1, FSLogo_meshes[i].indexOffset, 0, 0); // TODO: Part 1d, 1h
+		for each (GAMEOBJECT savedObj in List_Of_Game_Objects)
+		{
+			for (int i = 0; i < savedObj.meshCount; i++) {
+				vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(unsigned int), &savedObj.meshes[i].materialIndex);
+				vkCmdDrawIndexed(commandBuffer, savedObj.indexCount, 1, savedObj.batches[i].indexOffset, 0, 0); // TODO: Part 1d, 1h
+			}
 		}
+
 }
 
 void Renderer::UpdateCamera() {
@@ -523,6 +535,86 @@ std::string Renderer::ShaderAsString(const char* shaderFilePath) {
 	else
 		std::cout << "ERROR: Shader Source File \"" << shaderFilePath << "\" Not Found!" << std::endl;
 	return output;
+}
+
+void Renderer::ReadGameLevelFile(const char* levelFilePath) {
+	std::ifstream level;
+
+	level.open(levelFilePath, std::ifstream::in);
+
+	if (level.is_open() == false) {
+		std::cout << "ERROR: Level Source File \"" << levelFilePath << "\" Not Found!" << std::endl;
+		return;
+	}
+
+	std::string currLine;
+	GAMEOBJECT obj2save;
+	while (!level.eof()) {
+		std::getline(level, currLine);
+		if (currLine == "MESH") {
+			
+			std::getline(level, currLine); //Grab the next line
+			std::string objName = currLine.substr(0, currLine.find('.')); //grab the name of the mesh, ignore .xxx number for duplicates
+			obj2save.name = objName;
+
+			GW::MATH::GMATRIXF objPos;
+
+			for (int i = 0; i < 4; i++)
+			{
+				std::getline(level, currLine); //Grab the next line
+				std::string posVal = currLine.substr(currLine.find('('), currLine.find(')'));
+				
+				float x, y, z, w;
+
+				int scan  = std::sscanf(posVal.c_str(), "(%f, %f, %f, %f)", &x, &y, &z, &w);
+
+				if (i == 0) {
+					objPos.row1 = { x, y, z, w };
+				}
+				else if (i == 1) {
+					objPos.row2 = { x, y, z, w };
+				}
+				else if (i == 2) {
+					objPos.row3 = { x, y, z, w };
+				}
+				else if (i == 3) {
+					objPos.row4 = { x, y, z, w };
+				}
+				else if (scan == 0 || scan == EOF) {
+					std::cout << "error reading matrix";
+				}
+			}
+			obj2save.worldMatrix = objPos;
+			List_Of_Game_Objects.push_back(obj2save);
+		}
+	}
+
+}
+
+void Renderer::LoadGameLevel() {
+	H2B::Parser currObj;
+
+	for each (GAMEOBJECT savedObj in List_Of_Game_Objects)
+	{
+		if (currObj.Parse(std::string("Assets/H2B Models/" + savedObj.name + ".h2b").c_str())) {
+
+			savedObj.vertexCount = currObj.vertexCount;
+			savedObj.indexCount = currObj.indexCount;
+			savedObj.materialCount = currObj.materialCount;
+			savedObj.meshCount = currObj.meshCount;
+
+			savedObj.vertices = currObj.vertices;
+			savedObj.indices = currObj.indices;
+			savedObj.materials = currObj.materials;
+			savedObj.batches = currObj.batches;
+			savedObj.meshes = currObj.meshes;
+
+		}
+		else {
+			std::cout << "Error loading model: " + savedObj.name + ".h2b" << std::endl;
+		}
+	}
+
 }
 
 void Renderer::CleanUp()
