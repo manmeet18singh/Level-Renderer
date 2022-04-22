@@ -21,7 +21,7 @@ Renderer::Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GVulkanSurface _vlk)
 	PROXY_controller.Create();
 
 	//Load in default level
-	ReadGameLevelFile("Assets/1Model.txt");
+	ReadGameLevelFile("Assets/2Models.txt");
 	LoadGameLevel();
 
 	InitContent();
@@ -64,9 +64,12 @@ void Renderer::InitContent()
 	shader_model_data.SunAmbient = VECTOR_Ambient;
 	// TODO: part 3b
 
-	for (int i = 0; i < List_Of_Game_Objects.size(); i++)
+	for each (GAMEOBJECT savedObj in List_Of_Game_Objects)
 	{
-		//shader_model_data.materials[i] = FSLogo_materials[i].attrib;
+		for (int i = 0; i < savedObj.materialCount; i++)
+		{
+			shader_model_data.materials[i] = savedObj.materials[i].attrib;
+		}
 	}
 
 	/***************** GEOMETRY INTIALIZATION ******************/
@@ -81,15 +84,15 @@ void Renderer::InitContent()
 	for each (GAMEOBJECT savedObj in List_Of_Game_Objects)
 	{
 		// Transfer triangle data to the vertex buffer. (staging would be prefered here)
-		GvkHelper::create_buffer(physicalDevice, device, sizeof(H2B::VERTEX) * savedObj.vertices.size(),
+		GvkHelper::create_buffer(physicalDevice, device, sizeof(savedObj.vertices[0]) * savedObj.vertices.size(),
 			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
 			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexHandle, &vertexData);
-		GvkHelper::write_to_buffer(device, vertexData, savedObj.vertices.data(), sizeof(H2B::VERTEX) * savedObj.vertices.size());
+		GvkHelper::write_to_buffer(device, vertexData, savedObj.vertices.data(), sizeof(savedObj.vertices[0]) * savedObj.vertices.size());
 		// TODO: Part 1g
-		GvkHelper::create_buffer(physicalDevice, device, sizeof(int) * savedObj.indices.size(),
+		GvkHelper::create_buffer(physicalDevice, device, sizeof(savedObj.indices[0]) * savedObj.indices.size(),
 			VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
 			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexHandle, &indexData);
-		GvkHelper::write_to_buffer(device, indexData, savedObj.indices.data(), sizeof(int) * savedObj.indices.size());
+		GvkHelper::write_to_buffer(device, indexData, savedObj.indices.data(), sizeof(savedObj.indices[0]) * savedObj.indices.size());
 	}
 
 	// TODO: Part 2d
@@ -383,12 +386,17 @@ void Renderer::Shutdown()
 
 void Renderer::Render() {
 		// TODO: Part 2a
-		PROXY_matrix.RotateYGlobalF(GW::MATH::GIdentityMatrixF, timer.TotalTime(), MATRIX_World);
+		//PROXY_matrix.RotateYGlobalF(GW::MATH::GIdentityMatrixF, timer.TotalTime(), MATRIX_World);
 
 		// TODO: Part 3b
 
 		// TODO: Part 4d
-		shader_model_data.matricies[1] = MATRIX_World;
+	//for each (GAMEOBJECT savedObj in List_Of_Game_Objects)
+	//{
+		//shader_model_data.matricies[0] = List_Of_Game_Objects[0].worldMatrix;
+	//}
+
+
 		shader_model_data.ViewMatrix = MATRIX_View;
 
 		// grab the current Vulkan commandBuffer
@@ -423,8 +431,11 @@ void Renderer::Render() {
 		for each (GAMEOBJECT savedObj in List_Of_Game_Objects)
 		{
 			for (int i = 0; i < savedObj.meshCount; i++) {
-				vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(unsigned int), &savedObj.meshes[i].materialIndex);
-				vkCmdDrawIndexed(commandBuffer, savedObj.indexCount, 1, savedObj.batches[i].indexOffset, 0, 0); // TODO: Part 1d, 1h
+
+				shader_model_data.matricies[i] = savedObj.worldMatrix;
+
+				vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(unsigned), &savedObj.meshes[i].materialIndex);
+				vkCmdDrawIndexed(commandBuffer, savedObj.meshes[i].drawInfo.indexCount, 1, savedObj.meshes[i].drawInfo.indexOffset, 0, 0); // TODO: Part 1d, 1h
 			}
 		}
 
@@ -594,24 +605,24 @@ void Renderer::ReadGameLevelFile(const char* levelFilePath) {
 void Renderer::LoadGameLevel() {
 	H2B::Parser currObj;
 
-	for each (GAMEOBJECT savedObj in List_Of_Game_Objects)
+	for (int i = 0; i < List_Of_Game_Objects.size(); i++)
 	{
-		if (currObj.Parse(std::string("Assets/H2B Models/" + savedObj.name + ".h2b").c_str())) {
+		if (currObj.Parse(std::string("Assets/H2B Models/" + List_Of_Game_Objects[i].name + ".h2b").c_str())) {
 
-			savedObj.vertexCount = currObj.vertexCount;
-			savedObj.indexCount = currObj.indexCount;
-			savedObj.materialCount = currObj.materialCount;
-			savedObj.meshCount = currObj.meshCount;
+			List_Of_Game_Objects[i].vertexCount = currObj.vertexCount;
+			List_Of_Game_Objects[i].indexCount = currObj.indexCount;
+			List_Of_Game_Objects[i].materialCount = currObj.materialCount;
+			List_Of_Game_Objects[i].meshCount = currObj.meshCount;
 
-			savedObj.vertices = currObj.vertices;
-			savedObj.indices = currObj.indices;
-			savedObj.materials = currObj.materials;
-			savedObj.batches = currObj.batches;
-			savedObj.meshes = currObj.meshes;
+			List_Of_Game_Objects[i].vertices = currObj.vertices;
+			List_Of_Game_Objects[i].indices = currObj.indices;
+			List_Of_Game_Objects[i].materials = currObj.materials;
+			List_Of_Game_Objects[i].batches = currObj.batches;
+			List_Of_Game_Objects[i].meshes = currObj.meshes;
 
 		}
 		else {
-			std::cout << "Error loading model: " + savedObj.name + ".h2b" << std::endl;
+			std::cout << "Error loading model: " + List_Of_Game_Objects[i].name + ".h2b" << std::endl;
 		}
 	}
 

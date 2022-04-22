@@ -64,34 +64,29 @@ C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64079):
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\h2bParser.h(81,22): warning C4018: '<': signed/unsigned mismatch
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\h2bParser.h(96,22): warning C4018: '<': signed/unsigned mismatch
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\defines.h(4,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-renderer.cpp(87,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-renderer.cpp(92,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-renderer.cpp(101,20): warning C4018: '<': signed/unsigned mismatch
-renderer.cpp(305,20): warning C4018: '<': signed/unsigned mismatch
-renderer.cpp(315,20): warning C4018: '<': signed/unsigned mismatch
-renderer.cpp(322,20): warning C4018: '<': signed/unsigned mismatch
-renderer.cpp(425,22): warning C4018: '<': signed/unsigned mismatch
-renderer.cpp(459,40): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-renderer.cpp(501,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-renderer.cpp(503,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-renderer.cpp(508,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-renderer.cpp(569,22): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+renderer.cpp(69,21): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(90,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+renderer.cpp(95,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+renderer.cpp(104,20): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(308,20): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(318,20): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(325,20): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(433,22): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(470,40): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+renderer.cpp(512,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+renderer.cpp(514,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+renderer.cpp(519,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+renderer.cpp(580,22): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(16886,4): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
           with
           [
               _Ty=double
           ]
 renderer.cpp(46): message : see reference to function template instantiation 'GW::GReturn GW::MATH::GMatrix::ProjectionVulkanLHF<double,float&,float,float,GW::MATH::GMATRIXF&>(double &&,float &,float &&,float &&,GW::MATH::GMATRIXF &)' being compiled
-C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(16873,4): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
-          with
-          [
-              _Ty=double
-          ]
-renderer.cpp(386): message : see reference to function template instantiation 'GW::GReturn GW::MATH::GMatrix::RotateYGlobalF<const GW::MATH::GMATRIXF&,double,GW::MATH::GMATRIXF&>(const GW::MATH::GMATRIXF &,double &&,GW::MATH::GMATRIXF &)' being compiled
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(16877,4): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
           with
           [
               _Ty=int
           ]
-renderer.cpp(505): message : see reference to function template instantiation 'GW::GReturn GW::MATH::GMatrix::RotationYawPitchRollF<int,float&,int,GW::MATH::GMATRIXF&>(int &&,float &,int &&,GW::MATH::GMATRIXF &)' being compiled
+renderer.cpp(516): message : see reference to function template instantiation 'GW::GReturn GW::MATH::GMatrix::RotationYawPitchRollF<int,float&,int,GW::MATH::GMATRIXF&>(int &&,float &,int &&,GW::MATH::GMATRIXF &)' being compiled
   Assignment_2_Vulkan.vcxproj -> C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Debug\Assignment_2_Vulkan.exe
