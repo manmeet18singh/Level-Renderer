@@ -58,9 +58,9 @@ class Renderer
 	// TODO: Part 1g
 	VkBuffer indexHandle = nullptr;
 	VkDeviceMemory indexData = nullptr;
-	// TODO: Part 2c
-	std::vector<VkBuffer> SB_Handle;
-	std::vector<VkDeviceMemory> SB_Data;
+	//// TODO: Part 2c
+	//std::vector<VkBuffer> SB_Handle;
+	//std::vector<VkDeviceMemory> SB_Data;
 
 	VkShaderModule vertexShader = nullptr;
 	VkShaderModule pixelShader = nullptr;
@@ -68,11 +68,11 @@ class Renderer
 	VkPipeline pipeline = nullptr;
 	VkPipelineLayout pipelineLayout = nullptr;
 	// TODO: Part 2e
-	VkDescriptorSetLayout SB_SetLayout;
+	//VkDescriptorSetLayout SB_SetLayout;
 	// TODO: Part 2f
-	VkDescriptorPool SB_DescriptorPool;
+	/*VkDescriptorPool SB_DescriptorPool;*/
 	// TODO: Part 2g
-	std::vector<VkDescriptorSet> SB_DescriptorSet;
+	//std::vector<VkDescriptorSet> SB_DescriptorSet;
 	// TODO: Part 4f
 
 // TODO: Part 2a

@@ -21,7 +21,7 @@ Renderer::Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GVulkanSurface _vlk)
 	PROXY_controller.Create();
 
 	//Load in default level
-	ReadGameLevelFile("Assets/2Models.txt");
+	ReadGameLevelFile("Assets/SmallRoom.txt");
 	LoadGameLevel();
 
 	InitContent();
@@ -30,7 +30,7 @@ Renderer::Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GVulkanSurface _vlk)
 	Shutdown();
 }
 
-void Renderer::InitContent() 
+void Renderer::InitContent()
 {
 	//TODO ROTATE ON Y OVER TIME
 
@@ -64,11 +64,13 @@ void Renderer::InitContent()
 	shader_model_data.SunAmbient = VECTOR_Ambient;
 	// TODO: part 3b
 
-	for each (GAMEOBJECT savedObj in List_Of_Game_Objects)
+	int pos = 0;
+	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
 	{
-		for (int i = 0; i < savedObj.materialCount; i++)
+		for (int i = 0; i < List_Of_Game_Objects[j].materialCount; i++)
 		{
-			shader_model_data.materials[i] = savedObj.materials[i].attrib;
+			shader_model_data.materials[i] = List_Of_Game_Objects[j].materials[i].attrib;
+			//pos++;
 		}
 	}
 
@@ -81,32 +83,35 @@ void Renderer::InitContent()
 	// TODO: Part 1c
 	// Create Vertex Buffer
 
-	for each (GAMEOBJECT savedObj in List_Of_Game_Objects)
+	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
 	{
 		// Transfer triangle data to the vertex buffer. (staging would be prefered here)
-		GvkHelper::create_buffer(physicalDevice, device, sizeof(savedObj.vertices[0]) * savedObj.vertices.size(),
+		GvkHelper::create_buffer(physicalDevice, device, sizeof(List_Of_Game_Objects[j].vertices[0]) * List_Of_Game_Objects[j].vertices.size(),
 			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
 			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexHandle, &vertexData);
-		GvkHelper::write_to_buffer(device, vertexData, savedObj.vertices.data(), sizeof(savedObj.vertices[0]) * savedObj.vertices.size());
+		GvkHelper::write_to_buffer(device, vertexData, List_Of_Game_Objects[j].vertices.data(), sizeof(List_Of_Game_Objects[j].vertices[0]) * List_Of_Game_Objects[j].vertices.size());
 		// TODO: Part 1g
-		GvkHelper::create_buffer(physicalDevice, device, sizeof(savedObj.indices[0]) * savedObj.indices.size(),
+		GvkHelper::create_buffer(physicalDevice, device, sizeof(List_Of_Game_Objects[j].indices[0]) * List_Of_Game_Objects[j].indices.size(),
 			VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
 			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexHandle, &indexData);
-		GvkHelper::write_to_buffer(device, indexData, savedObj.indices.data(), sizeof(savedObj.indices[0]) * savedObj.indices.size());
+		GvkHelper::write_to_buffer(device, indexData, List_Of_Game_Objects[j].indices.data(), sizeof(List_Of_Game_Objects[j].indices[0]) * List_Of_Game_Objects[j].indices.size());
 	}
 
 	// TODO: Part 2d
 	vlk.GetSwapchainImageCount(max_active_frames);
-	SB_Handle.resize(max_active_frames);
-	SB_Data.resize(max_active_frames);
-	SB_DescriptorSet.resize(max_active_frames);
-
-	for (int i = 0; i < max_active_frames; i++)
+	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
 	{
-		GvkHelper::create_buffer(physicalDevice, device, sizeof(shader_model_data),
-			VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &SB_Handle[i], &SB_Data[i]);
-		GvkHelper::write_to_buffer(device, SB_Data[i], &shader_model_data, sizeof(shader_model_data));
+		List_Of_Game_Objects[j].SB_Handle.resize(max_active_frames);
+		List_Of_Game_Objects[j].SB_Data.resize(max_active_frames);
+		List_Of_Game_Objects[j].SB_DescriptorSet.resize(max_active_frames);
+
+		for (int i = 0; i < max_active_frames; i++)
+		{
+			GvkHelper::create_buffer(physicalDevice, device, sizeof(shader_model_data),
+				VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &List_Of_Game_Objects[j].SB_Handle[i], &List_Of_Game_Objects[j].SB_Data[i]);
+			GvkHelper::write_to_buffer(device, List_Of_Game_Objects[j].SB_Data[i], &shader_model_data, sizeof(shader_model_data));
+		}
 	}
 }
 
@@ -262,78 +267,89 @@ void Renderer::InitPipeline(unsigned int width, unsigned int height)
 	dynamic_create_info.pDynamicStates = dynamic_state;
 
 	// TODO: Part 2e
-	VkDescriptorSetLayoutBinding sb_discriptor_binding = {};
-	sb_discriptor_binding.descriptorCount = 1;
-	sb_discriptor_binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-	sb_discriptor_binding.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS;
-	sb_discriptor_binding.binding = 0;
-	sb_discriptor_binding.pImmutableSamplers = VK_NULL_HANDLE;
-
-	VkDescriptorSetLayoutCreateInfo sb_discriptor_create_info = {};
-	sb_discriptor_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	sb_discriptor_create_info.flags = 0;
-	sb_discriptor_create_info.bindingCount = 1;
-	sb_discriptor_create_info.pNext = VK_NULL_HANDLE;
-	sb_discriptor_create_info.pBindings = &sb_discriptor_binding;
-
-	if (vkCreateDescriptorSetLayout(device, &sb_discriptor_create_info, nullptr, &SB_SetLayout) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create descriptor set layout!");
-	}
-
-	// TODO: Part 2f
-	VkDescriptorPoolSize discriptor_pool_size = {};
-	discriptor_pool_size.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-	discriptor_pool_size.descriptorCount = static_cast<uint32_t>(max_active_frames);
-
-	VkDescriptorPoolCreateInfo sb_discriptor_pool_create_info = {};
-	sb_discriptor_pool_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	sb_discriptor_pool_create_info.pNext = VK_NULL_HANDLE;
-	sb_discriptor_pool_create_info.flags = 0;
-	sb_discriptor_pool_create_info.maxSets = static_cast<uint32_t>(max_active_frames);
-	sb_discriptor_pool_create_info.poolSizeCount = 1;
-	sb_discriptor_pool_create_info.pPoolSizes = &discriptor_pool_size;
-
-	if (vkCreateDescriptorPool(device, &sb_discriptor_pool_create_info, nullptr, &SB_DescriptorPool) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create descriptor pool!");
-	}
-	// TODO: Part 4f
-// TODO: Part 2g
-	VkDescriptorSetAllocateInfo sb_set_alloc_info = {};
-	sb_set_alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	sb_set_alloc_info.pSetLayouts = &SB_SetLayout;
-	sb_set_alloc_info.pNext = VK_NULL_HANDLE;
-	sb_set_alloc_info.descriptorSetCount = 1;
-	sb_set_alloc_info.descriptorPool = SB_DescriptorPool;
-
-	for (int i = 0; i < max_active_frames; i++)
+	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
 	{
-		if (vkAllocateDescriptorSets(device, &sb_set_alloc_info, &SB_DescriptorSet[i]) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
+		VkDescriptorSetLayoutBinding sb_discriptor_binding = {};
+		sb_discriptor_binding.descriptorCount = 1;
+		sb_discriptor_binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		sb_discriptor_binding.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS;
+		sb_discriptor_binding.binding = 0;
+		sb_discriptor_binding.pImmutableSamplers = VK_NULL_HANDLE;
+
+		VkDescriptorSetLayoutCreateInfo sb_discriptor_create_info = {};
+		sb_discriptor_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		sb_discriptor_create_info.flags = 0;
+		sb_discriptor_create_info.bindingCount = 1;
+		sb_discriptor_create_info.pNext = VK_NULL_HANDLE;
+		sb_discriptor_create_info.pBindings = &sb_discriptor_binding;
+
+		if (vkCreateDescriptorSetLayout(device, &sb_discriptor_create_info, nullptr, &List_Of_Game_Objects[j].SB_SetLayout) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create descriptor set layout!");
 		}
 	}
 
+	// TODO: Part 2f
+	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
+	{
+		VkDescriptorPoolSize discriptor_pool_size = {};
+		discriptor_pool_size.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		discriptor_pool_size.descriptorCount = static_cast<uint32_t>(max_active_frames);
+
+		VkDescriptorPoolCreateInfo sb_discriptor_pool_create_info = {};
+		sb_discriptor_pool_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		sb_discriptor_pool_create_info.pNext = VK_NULL_HANDLE;
+		sb_discriptor_pool_create_info.flags = 0;
+		sb_discriptor_pool_create_info.maxSets = static_cast<uint32_t>(max_active_frames);
+		sb_discriptor_pool_create_info.poolSizeCount = 1;
+		sb_discriptor_pool_create_info.pPoolSizes = &discriptor_pool_size;
+
+		if (vkCreateDescriptorPool(device, &sb_discriptor_pool_create_info, nullptr, &List_Of_Game_Objects[j].SB_DescriptorPool) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create descriptor pool!");
+		}
+	}
+	// TODO: Part 4f
+// TODO: Part 2g
+	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
+	{
+		VkDescriptorSetAllocateInfo sb_set_alloc_info = {};
+		sb_set_alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		sb_set_alloc_info.pSetLayouts = &List_Of_Game_Objects[j].SB_SetLayout;
+		sb_set_alloc_info.pNext = VK_NULL_HANDLE;
+		sb_set_alloc_info.descriptorSetCount = 1;
+		sb_set_alloc_info.descriptorPool = List_Of_Game_Objects[j].SB_DescriptorPool;
+
+		for (int i = 0; i < max_active_frames; i++)
+		{
+			if (vkAllocateDescriptorSets(device, &sb_set_alloc_info, &List_Of_Game_Objects[j].SB_DescriptorSet[i]) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
+		}
+	}
 	// TODO: Part 4f
 // TODO: Part 2h
-	std::vector <VkDescriptorBufferInfo> sb_descriptor_buffer_info(max_active_frames);
-	for (int i = 0; i < max_active_frames; i++) {
-		sb_descriptor_buffer_info[i].buffer = SB_Handle[i];
-		sb_descriptor_buffer_info[i].offset = 0;
-		sb_descriptor_buffer_info[i].range = VK_WHOLE_SIZE;
-	}
+	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
+	{
+		std::vector <VkDescriptorBufferInfo> sb_descriptor_buffer_info(max_active_frames);
+		for (int i = 0; i < max_active_frames; i++) {
+			sb_descriptor_buffer_info[i].buffer = List_Of_Game_Objects[j].SB_Handle[i];
+			sb_descriptor_buffer_info[i].offset = 0;
+			sb_descriptor_buffer_info[i].range = VK_WHOLE_SIZE;
+		}
 
-	std::vector <VkWriteDescriptorSet> sb_write_descriptor_set(max_active_frames);
-	for (int i = 0; i < max_active_frames; i++) {
-		sb_write_descriptor_set[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		sb_write_descriptor_set[i].pNext = VK_NULL_HANDLE;
-		sb_write_descriptor_set[i].pTexelBufferView = VK_NULL_HANDLE;
-		sb_write_descriptor_set[i].dstSet = SB_DescriptorSet[i];
-		sb_write_descriptor_set[i].pBufferInfo = &sb_descriptor_buffer_info[i];
-		sb_write_descriptor_set[i].pImageInfo = VK_NULL_HANDLE;
-		sb_write_descriptor_set[i].dstBinding = 0;
-		sb_write_descriptor_set[i].descriptorCount = 1;
-		sb_write_descriptor_set[i].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		sb_write_descriptor_set[i].dstArrayElement = 0;
-		vkUpdateDescriptorSets(device, 1, &sb_write_descriptor_set[i], 0, VK_NULL_HANDLE);
+		std::vector <VkWriteDescriptorSet> sb_write_descriptor_set(max_active_frames);
+		for (int i = 0; i < max_active_frames; i++) {
+			sb_write_descriptor_set[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			sb_write_descriptor_set[i].pNext = VK_NULL_HANDLE;
+			sb_write_descriptor_set[i].pTexelBufferView = VK_NULL_HANDLE;
+			sb_write_descriptor_set[i].dstSet = List_Of_Game_Objects[j].SB_DescriptorSet[i];
+			sb_write_descriptor_set[i].pBufferInfo = &sb_descriptor_buffer_info[i];
+			sb_write_descriptor_set[i].pImageInfo = VK_NULL_HANDLE;
+			sb_write_descriptor_set[i].dstBinding = 0;
+			sb_write_descriptor_set[i].descriptorCount = 1;
+			sb_write_descriptor_set[i].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+			sb_write_descriptor_set[i].dstArrayElement = 0;
+			vkUpdateDescriptorSets(device, 1, &sb_write_descriptor_set[i], 0, VK_NULL_HANDLE);
+		}
 	}
 	// TODO: Part 4f
 
@@ -343,15 +359,19 @@ void Renderer::InitPipeline(unsigned int width, unsigned int height)
 	push_constant_range.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS;
 
 	// Descriptor pipeline layout
-	VkPipelineLayoutCreateInfo pipeline_layout_create_info = {};
-	pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	// TODO: Part 2e
-	pipeline_layout_create_info.setLayoutCount = 1;
-	pipeline_layout_create_info.pSetLayouts = &SB_SetLayout;
-	// TODO: Part 3c
-	pipeline_layout_create_info.pushConstantRangeCount = 1;
-	pipeline_layout_create_info.pPushConstantRanges = &push_constant_range;
-	vkCreatePipelineLayout(device, &pipeline_layout_create_info, nullptr, &pipelineLayout);
+	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
+	{
+
+		VkPipelineLayoutCreateInfo pipeline_layout_create_info = {};
+		pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		// TODO: Part 2e
+		pipeline_layout_create_info.setLayoutCount = 1;
+		pipeline_layout_create_info.pSetLayouts = &List_Of_Game_Objects[j].SB_SetLayout;
+		// TODO: Part 3c
+		pipeline_layout_create_info.pushConstantRangeCount = 1;
+		pipeline_layout_create_info.pPushConstantRanges = &push_constant_range;
+		vkCreatePipelineLayout(device, &pipeline_layout_create_info, nullptr, &pipelineLayout);
+	}
 
 	// Pipeline State... (FINALLY) 
 	VkGraphicsPipelineCreateInfo pipeline_create_info = {};
@@ -385,59 +405,62 @@ void Renderer::Shutdown()
 }
 
 void Renderer::Render() {
-		// TODO: Part 2a
-		//PROXY_matrix.RotateYGlobalF(GW::MATH::GIdentityMatrixF, timer.TotalTime(), MATRIX_World);
+	// TODO: Part 2a
+	//PROXY_matrix.RotateYGlobalF(GW::MATH::GIdentityMatrixF, timer.TotalTime(), MATRIX_World);
 
-		// TODO: Part 3b
+	// TODO: Part 3b
 
-		// TODO: Part 4d
-	//for each (GAMEOBJECT savedObj in List_Of_Game_Objects)
-	//{
-		//shader_model_data.matricies[0] = List_Of_Game_Objects[0].worldMatrix;
-	//}
+	// TODO: Part 4d
+//for (int j = 0; j < List_Of_Game_Objects.size(); j++)
+//{
+	//shader_model_data.matricies[0] = List_Of_Game_Objects[0].worldMatrix;
+//}
 
 
-		shader_model_data.ViewMatrix = MATRIX_View;
+	shader_model_data.ViewMatrix = MATRIX_View;
 
-		// grab the current Vulkan commandBuffer
-		unsigned int currentBuffer;
-		vlk.GetSwapchainCurrentImage(currentBuffer);
-		VkCommandBuffer commandBuffer;
-		vlk.GetCommandBuffer(currentBuffer, (void**)&commandBuffer);
-		// what is the current client area dimensions?
-		unsigned int width, height;
-		win.GetClientWidth(width);
-		win.GetClientHeight(height);
-		// setup the pipeline's dynamic settings
-		VkViewport viewport = {
-			0, 0, static_cast<float>(width), static_cast<float>(height), 0, 1
-		};
-		VkRect2D scissor = { {0, 0}, {width, height} };
-		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
-		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
-		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+	// grab the current Vulkan commandBuffer
+	unsigned int currentBuffer;
+	vlk.GetSwapchainCurrentImage(currentBuffer);
+	VkCommandBuffer commandBuffer;
+	vlk.GetCommandBuffer(currentBuffer, (void**)&commandBuffer);
+	// what is the current client area dimensions?
+	unsigned int width, height;
+	win.GetClientWidth(width);
+	win.GetClientHeight(height);
+	// setup the pipeline's dynamic settings
+	VkViewport viewport = {
+		0, 0, static_cast<float>(width), static_cast<float>(height), 0, 1
+	};
+	VkRect2D scissor = { {0, 0}, {width, height} };
+	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
-		// now we can draw
-		VkDeviceSize offsets[] = { 0 };
-		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vertexHandle, offsets);
-		// TODO: Part 1h
-		vkCmdBindIndexBuffer(commandBuffer, indexHandle, *offsets, VK_INDEX_TYPE_UINT32);
-		// TODO: Part 4d
-		GvkHelper::write_to_buffer(device, SB_Data[currentBuffer], &shader_model_data, sizeof(shader_model_data));
+	// now we can draw
+	VkDeviceSize offsets[] = { 0 };
+	vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vertexHandle, offsets);
+	// TODO: Part 1h
+	vkCmdBindIndexBuffer(commandBuffer, indexHandle, *offsets, VK_INDEX_TYPE_UINT32);
+
+
+	// TODO: Part 3b
+		// TODO: Part 3d
+	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
+	{
 		// TODO: Part 2i
-		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &SB_DescriptorSet[currentBuffer], 0, VK_NULL_HANDLE);
-		// TODO: Part 3b
-			// TODO: Part 3d
-		for each (GAMEOBJECT savedObj in List_Of_Game_Objects)
-		{
-			for (int i = 0; i < savedObj.meshCount; i++) {
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &List_Of_Game_Objects[j].SB_DescriptorSet[currentBuffer], 0, VK_NULL_HANDLE);
 
-				shader_model_data.matricies[i] = savedObj.worldMatrix;
+		// TODO: Part 4d
+		GvkHelper::write_to_buffer(device, List_Of_Game_Objects[j].SB_Data[currentBuffer], &shader_model_data, sizeof(shader_model_data));
+		for (int i = 0; i < List_Of_Game_Objects[j].meshCount; i++) {
 
-				vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(unsigned), &savedObj.meshes[i].materialIndex);
-				vkCmdDrawIndexed(commandBuffer, savedObj.meshes[i].drawInfo.indexCount, 1, savedObj.meshes[i].drawInfo.indexOffset, 0, 0); // TODO: Part 1d, 1h
-			}
+			shader_model_data.matricies[i] = List_Of_Game_Objects[j].worldMatrix;
+
+			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(unsigned), &List_Of_Game_Objects[j].meshes[i].materialIndex);
+			vkCmdDrawIndexed(commandBuffer, List_Of_Game_Objects[j].meshes[i].drawInfo.indexCount, 1, List_Of_Game_Objects[j].meshes[i].drawInfo.indexOffset, 0, 0); // TODO: Part 1d, 1h
 		}
+	}
 
 }
 
@@ -466,7 +489,7 @@ void Renderer::UpdateCamera() {
 	float KEY_mouse_x = 0;
 	float KEY_mouse_y = 0;
 
-	const float Camera_Speed = 0.9f;
+	const float Camera_Speed = 2.0f;
 	float Seconds_Passed_Since_Last_Frame = timer.Delta();
 
 	unsigned int width, height;
@@ -478,7 +501,7 @@ void Renderer::UpdateCamera() {
 
 	PROXY_input.GetState(G_KEY_SPACE, KEY_spc);
 	PROXY_input.GetState(G_KEY_LEFTSHIFT, KEY_lShift);
-	
+
 	PROXY_input.GetState(G_KEY_W, KEY_w);
 	PROXY_input.GetState(G_KEY_S, KEY_s);
 	PROXY_input.GetState(G_KEY_D, KEY_d);
@@ -502,7 +525,7 @@ void Renderer::UpdateCamera() {
 
 	// TODO: Part 4e
 	float Per_Frame_Speed = Camera_Speed * Seconds_Passed_Since_Last_Frame;
-	
+
 	float Total_Y_Change = KEY_spc - KEY_lShift + KEY_rTrigger - KEY_lTrigger;
 	float Total_Z_Change = KEY_w - KEY_s + KEY_lStick_y;
 	float Total_X_Change = KEY_d - KEY_a + KEY_lStick_x;
@@ -510,7 +533,7 @@ void Renderer::UpdateCamera() {
 	PROXY_matrix.TranslateLocalF(Camera, GW::MATH::GVECTORF{ Total_X_Change * Per_Frame_Speed , Total_Y_Change * Per_Frame_Speed , Total_Z_Change * Per_Frame_Speed }, Camera);
 
 	float Thumb_Speed = G_PI * Seconds_Passed_Since_Last_Frame;
-	
+
 	float Total_Pitch = G_DEGREE_TO_RADIAN(65) * KEY_mouse_y / height + KEY_rStick_y * -Thumb_Speed;
 	GW::MATH::GMATRIXF Pitch_Mat = GW::MATH::GIdentityMatrixF;
 	PROXY_matrix.RotationYawPitchRollF(0, Total_Pitch, 0, Pitch_Mat);
@@ -563,7 +586,7 @@ void Renderer::ReadGameLevelFile(const char* levelFilePath) {
 	while (!level.eof()) {
 		std::getline(level, currLine);
 		if (currLine == "MESH") {
-			
+
 			std::getline(level, currLine); //Grab the next line
 			std::string objName = currLine.substr(0, currLine.find('.')); //grab the name of the mesh, ignore .xxx number for duplicates
 			obj2save.name = objName;
@@ -574,10 +597,10 @@ void Renderer::ReadGameLevelFile(const char* levelFilePath) {
 			{
 				std::getline(level, currLine); //Grab the next line
 				std::string posVal = currLine.substr(currLine.find('('), currLine.find(')'));
-				
+
 				float x, y, z, w;
 
-				int scan  = std::sscanf(posVal.c_str(), "(%f, %f, %f, %f)", &x, &y, &z, &w);
+				int scan = std::sscanf(posVal.c_str(), "(%f, %f, %f, %f)", &x, &y, &z, &w);
 
 				if (i == 0) {
 					objPos.row1 = { x, y, z, w };
@@ -636,13 +659,17 @@ void Renderer::CleanUp()
 	// TODO: Part 1g
 	vkDestroyBuffer(device, indexHandle, nullptr);
 	vkFreeMemory(device, indexData, nullptr);
-	// TODO: Part 2d
-	for (int i = 0; i < SB_Handle.size(); i++) {
-		vkDestroyBuffer(device, SB_Handle[i], nullptr);
-	}
 
-	for (int i = 0; i < SB_Data.size(); i++) {
-		vkFreeMemory(device, SB_Data[i], nullptr);
+	// TODO: Part 2d
+	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
+	{
+		for (int i = 0; i < List_Of_Game_Objects[j].SB_Handle.size(); i++) {
+			vkDestroyBuffer(device, List_Of_Game_Objects[j].SB_Handle[i], nullptr);
+		}
+
+		for (int i = 0; i < List_Of_Game_Objects[j].SB_Data.size(); i++) {
+			vkFreeMemory(device, List_Of_Game_Objects[j].SB_Data[i], nullptr);
+		}
 	}
 
 	vkDestroyBuffer(device, vertexHandle, nullptr);
@@ -650,9 +677,15 @@ void Renderer::CleanUp()
 	vkDestroyShaderModule(device, vertexShader, nullptr);
 	vkDestroyShaderModule(device, pixelShader, nullptr);
 	// TODO: Part 2e
-	vkDestroyDescriptorSetLayout(device, SB_SetLayout, nullptr);
+	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
+	{
+		vkDestroyDescriptorSetLayout(device, List_Of_Game_Objects[j].SB_SetLayout, nullptr);
+	}
 	// TODO: part 2f
-	vkDestroyDescriptorPool(device, SB_DescriptorPool, nullptr);
+	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
+	{
+		vkDestroyDescriptorPool(device, List_Of_Game_Objects[j].SB_DescriptorPool, nullptr);
+	}
 	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 	vkDestroyPipeline(device, pipeline, nullptr);
 }
