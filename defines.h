@@ -41,6 +41,12 @@ struct GAMEOBJECT {
 	std::vector<H2B::MESH> meshes;
 };
 
+struct LIGHT {
+	std::string name;
+
+	GW::MATH::GMATRIXF worldMatrix;
+};
+
 struct INPUT_CONTROLLER
 {
 	float INPUT_spc = 0;
