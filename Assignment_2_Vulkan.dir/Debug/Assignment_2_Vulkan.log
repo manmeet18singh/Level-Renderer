@@ -64,14 +64,14 @@ C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\Gateware/Gateware.h(64079):
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\h2bParser.h(81,22): warning C4018: '<': signed/unsigned mismatch
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\h2bParser.h(96,22): warning C4018: '<': signed/unsigned mismatch
 C:\Users\Manmeet Singh\Desktop\Project-And-Portfolio\defines.h(4,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-renderer.cpp(70,21): warning C4018: '<': signed/unsigned mismatch
-renderer.cpp(92,176): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-renderer.cpp(97,172): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-renderer.cpp(108,21): warning C4018: '<': signed/unsigned mismatch
-renderer.cpp(321,21): warning C4018: '<': signed/unsigned mismatch
-renderer.cpp(333,21): warning C4018: '<': signed/unsigned mismatch
-renderer.cpp(340,21): warning C4018: '<': signed/unsigned mismatch
-renderer.cpp(456,21): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(72,21): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(101,202): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+renderer.cpp(106,198): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+renderer.cpp(117,21): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(330,21): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(342,21): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(349,21): warning C4018: '<': signed/unsigned mismatch
+renderer.cpp(455,21): warning C4018: '<': signed/unsigned mismatch
 renderer.cpp(493,40): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 renderer.cpp(535,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 renderer.cpp(537,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data

@@ -4,7 +4,8 @@
 [[vk::push_constant]]
 cbuffer MESH_INDEX
 {
-    uint mesh_ID;
+    uint model_ID;
+    uint material_ID;
 };
 
 struct OBJ_ATTRIBUTES
@@ -50,13 +51,13 @@ float4 main(PS_INPUT input) : SV_TARGET
     
 	// TODO: Part 3a
 	// TODO: Part 4c
-    float3 finalLight = lightRatio * SceneData[0].SunColor.xyz * SceneData[0].materials[mesh_ID].Kd;
+    float3 finalLight = lightRatio * SceneData[0].SunColor.xyz * SceneData[0].materials[material_ID].Kd;
   //  
 	 //TODO: Part 4g (half-vector or reflect method your choice)  
     float3 viewDir = normalize(SceneData[0].CamPos.xyz - input.PosW.xyz);
     float3 halfVector = normalize((-SceneData[0].SunDirection.xyz) + viewDir);
-    float intensity = max(pow(clamp(dot(input.Norm, halfVector), 0, 1), SceneData[0].materials[mesh_ID].Ns), 0);
-    float3 reflectedLight = SceneData[0].SunColor.xyz * SceneData[0].materials[mesh_ID].Ks * intensity;
+    float intensity = max(pow(clamp(dot(input.Norm, halfVector), 0, 1), SceneData[0].materials[material_ID].Ns), 0);
+    float3 reflectedLight = SceneData[0].SunColor.xyz * SceneData[0].materials[material_ID].Ks * intensity;
 
     finalLight += reflectedLight;
     return saturate(float4(finalLight, 0));

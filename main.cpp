@@ -29,7 +29,7 @@ int main()
 		// TODO: Part 1a
 		win.SetWindowName("Manmeet Singh - Assignment 2 - VULKAN");
 		VkClearValue clrAndDepth[2];
-		clrAndDepth[0].color = { {0.113f, 0.137f, 0.145f, 1} };
+		clrAndDepth[0].color = { {0.341f, 0.262f, 0.356f, 1.0f} };
 		clrAndDepth[1].depthStencil = { 1.0f, 0u };
 		msgs.Create([&](const GW::GEvent& e) {
 			GW::SYSTEM::GWindow::Events q;

@@ -41,6 +41,12 @@ class Renderer
 		H2B::ATTRIBUTES materials[MAX_SUBMESH_PER_DRAW];
 	};
 
+	struct PUSH_CONSTANTS
+	{
+		unsigned model_Index, material_Index;
+		int padding[30] = {};
+	};
+
 	// proxy handles
 	GW::SYSTEM::GWindow win;
 	GW::GRAPHICS::GVulkanSurface vlk;
@@ -53,11 +59,11 @@ class Renderer
 
 	// what we need at a minimum to draw a triangle
 	VkDevice device = nullptr;
-	VkBuffer vertexHandle = nullptr;
-	VkDeviceMemory vertexData = nullptr;
-	// TODO: Part 1g
-	VkBuffer indexHandle = nullptr;
-	VkDeviceMemory indexData = nullptr;
+	//VkBuffer vertexHandle = nullptr;
+	//VkDeviceMemory vertexData = nullptr;
+	//// TODO: Part 1g
+	//VkBuffer indexHandle = nullptr;
+	//VkDeviceMemory indexData = nullptr;
 	//// TODO: Part 2c
 	//std::vector<VkBuffer> SB_Handle;
 	//std::vector<VkDeviceMemory> SB_Data;
@@ -90,6 +96,7 @@ class Renderer
 
 	// TODO: Part 2b
 	SHADER_MODEL_DATA shader_model_data;
+	PUSH_CONSTANTS push_constants;
 
 	unsigned int max_active_frames;
 	// TODO: Part 4g

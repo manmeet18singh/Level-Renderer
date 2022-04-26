@@ -3,8 +3,9 @@
 
 [[vk::push_constant]]
 cbuffer MESH_INDEX
-{
-    uint mesh_ID;
+{   
+    uint model_ID;
+    uint material_ID;
 };
 
 struct OBJ_ATTRIBUTES
@@ -51,10 +52,10 @@ PS_INPUT main(VS_INPUT input)
 {
     PS_INPUT output = (PS_INPUT) 0;
     output.Pos = float4(input.Pos, 1);
-    output.Norm = mul(float4(input.Norm, 0), SceneData[0].matricies[mesh_ID]).xyz;
+    output.Norm = mul(float4(input.Norm, 0), SceneData[0].matricies[model_ID]).xyz;
     output.Uvw = input.Uvw;
     
-    output.Pos = mul(output.Pos, SceneData[0].matricies[mesh_ID]);
+    output.Pos = mul(output.Pos, SceneData[0].matricies[model_ID]);
     output.PosW = output.Pos.xyz;
     
     output.Pos = mul(output.Pos, SceneData[0].ViewMatrix);

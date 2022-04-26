@@ -7,6 +7,12 @@ struct GAMEOBJECT {
 	
 #pragma region Storage Buffer Stuff
 
+	VkBuffer vertexHandle = nullptr;
+	VkDeviceMemory vertexData = nullptr;
+	// TODO: Part 1g
+	VkBuffer indexHandle = nullptr;
+	VkDeviceMemory indexData = nullptr;
+
 	std::vector<VkBuffer> SB_Handle;
 	std::vector<VkDeviceMemory> SB_Data;
 
@@ -19,6 +25,8 @@ struct GAMEOBJECT {
 #pragma endregion
 
 	std::string name;
+
+	unsigned matOffset;
 
 	unsigned vertexCount;
 	unsigned indexCount;

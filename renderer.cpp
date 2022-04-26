@@ -21,7 +21,7 @@ Renderer::Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GVulkanSurface _vlk)
 	PROXY_controller.Create();
 
 	//Load in default level
-	ReadGameLevelFile("Assets/SmallRoom.txt");
+	ReadGameLevelFile("Assets/GameLevel.txt");
 	LoadGameLevel();
 
 	InitContent();
@@ -34,8 +34,8 @@ void Renderer::InitContent()
 {
 	//TODO ROTATE ON Y OVER TIME
 
-	GW::MATH::GVECTORF Eye = { 0.75f, 0.25, -1.5f };
-	GW::MATH::GVECTORF At = { 0.15f, 0.75f, 0.0f };
+	GW::MATH::GVECTORF Eye = {-30.0f, 20.0f, 10.0f };
+	GW::MATH::GVECTORF At = { 0.0f, 0.0f, 0.0f };
 	GW::MATH::GVECTORF Up = { 0.0f, 1.0f, 0.0f };
 
 	PROXY_matrix.LookAtLHF(Eye, At, Up, MATRIX_View);
@@ -64,14 +64,23 @@ void Renderer::InitContent()
 	shader_model_data.SunAmbient = VECTOR_Ambient;
 	// TODO: part 3b
 
+	unsigned offset = 0;
 	int pos = 0;
 	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
 	{
+
 		for (int i = 0; i < List_Of_Game_Objects[j].materialCount; i++)
 		{
-			shader_model_data.materials[i] = List_Of_Game_Objects[j].materials[i].attrib;
-			//pos++;
+			shader_model_data.materials[pos] = List_Of_Game_Objects[j].materials[i].attrib;
+			pos++;
 		}
+		List_Of_Game_Objects[j].matOffset = offset;
+		offset += List_Of_Game_Objects[j].materialCount;
+	}
+
+	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
+	{
+		shader_model_data.matricies[j] = List_Of_Game_Objects[j].worldMatrix;
 	}
 
 	/***************** GEOMETRY INTIALIZATION ******************/
@@ -86,15 +95,15 @@ void Renderer::InitContent()
 	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
 	{
 		// Transfer triangle data to the vertex buffer. (staging would be prefered here)
-		GvkHelper::create_buffer(physicalDevice, device, sizeof(List_Of_Game_Objects[j].vertices[0]) * List_Of_Game_Objects[j].vertices.size(),
+		GvkHelper::create_buffer(physicalDevice, device, (sizeof(List_Of_Game_Objects[j].vertices[0]) * List_Of_Game_Objects[j].vertices.size()),
 			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexHandle, &vertexData);
-		GvkHelper::write_to_buffer(device, vertexData, List_Of_Game_Objects[j].vertices.data(), sizeof(List_Of_Game_Objects[j].vertices[0]) * List_Of_Game_Objects[j].vertices.size());
+			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &List_Of_Game_Objects[j].vertexHandle, &List_Of_Game_Objects[j].vertexData);
+		GvkHelper::write_to_buffer(device, List_Of_Game_Objects[j].vertexData, List_Of_Game_Objects[j].vertices.data(), (sizeof(List_Of_Game_Objects[j].vertices[0]) * List_Of_Game_Objects[j].vertices.size()));
 		// TODO: Part 1g
-		GvkHelper::create_buffer(physicalDevice, device, sizeof(List_Of_Game_Objects[j].indices[0]) * List_Of_Game_Objects[j].indices.size(),
+		GvkHelper::create_buffer(physicalDevice, device, (sizeof(List_Of_Game_Objects[j].indices[0]) * List_Of_Game_Objects[j].indices.size()),
 			VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexHandle, &indexData);
-		GvkHelper::write_to_buffer(device, indexData, List_Of_Game_Objects[j].indices.data(), sizeof(List_Of_Game_Objects[j].indices[0]) * List_Of_Game_Objects[j].indices.size());
+			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &List_Of_Game_Objects[j].indexHandle, &List_Of_Game_Objects[j].indexData);
+		GvkHelper::write_to_buffer(device, List_Of_Game_Objects[j].indexData, List_Of_Game_Objects[j].indices.data(), (sizeof(List_Of_Game_Objects[j].indices[0]) * List_Of_Game_Objects[j].indices.size()));
 	}
 
 	// TODO: Part 2d
@@ -355,7 +364,7 @@ void Renderer::InitPipeline(unsigned int width, unsigned int height)
 
 	VkPushConstantRange push_constant_range = {};
 	push_constant_range.offset = 0;
-	push_constant_range.size = sizeof(unsigned int);
+	push_constant_range.size = sizeof(PUSH_CONSTANTS);
 	push_constant_range.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS;
 
 	// Descriptor pipeline layout
@@ -406,16 +415,6 @@ void Renderer::Shutdown()
 
 void Renderer::Render() {
 	// TODO: Part 2a
-	//PROXY_matrix.RotateYGlobalF(GW::MATH::GIdentityMatrixF, timer.TotalTime(), MATRIX_World);
-
-	// TODO: Part 3b
-
-	// TODO: Part 4d
-//for (int j = 0; j < List_Of_Game_Objects.size(); j++)
-//{
-	//shader_model_data.matricies[0] = List_Of_Game_Objects[0].worldMatrix;
-//}
-
 
 	shader_model_data.ViewMatrix = MATRIX_View;
 
@@ -437,17 +436,17 @@ void Renderer::Render() {
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
-	// now we can draw
-	VkDeviceSize offsets[] = { 0 };
-	vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vertexHandle, offsets);
-	// TODO: Part 1h
-	vkCmdBindIndexBuffer(commandBuffer, indexHandle, *offsets, VK_INDEX_TYPE_UINT32);
 
 
 	// TODO: Part 3b
 		// TODO: Part 3d
 	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
 	{
+		// now we can draw
+		VkDeviceSize offsets[] = { 0 };
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &List_Of_Game_Objects[j].vertexHandle, offsets);
+		// TODO: Part 1h
+		vkCmdBindIndexBuffer(commandBuffer, List_Of_Game_Objects[j].indexHandle, *offsets, VK_INDEX_TYPE_UINT32);
 		// TODO: Part 2i
 		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &List_Of_Game_Objects[j].SB_DescriptorSet[currentBuffer], 0, VK_NULL_HANDLE);
 
@@ -455,9 +454,10 @@ void Renderer::Render() {
 		GvkHelper::write_to_buffer(device, List_Of_Game_Objects[j].SB_Data[currentBuffer], &shader_model_data, sizeof(shader_model_data));
 		for (int i = 0; i < List_Of_Game_Objects[j].meshCount; i++) {
 
-			shader_model_data.matricies[i] = List_Of_Game_Objects[j].worldMatrix;
+			push_constants.material_Index = List_Of_Game_Objects[j].matOffset + List_Of_Game_Objects[j].meshes[i].materialIndex;
+			push_constants.model_Index = j;
 
-			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(unsigned), &List_Of_Game_Objects[j].meshes[i].materialIndex);
+			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(push_constants), &push_constants);
 			vkCmdDrawIndexed(commandBuffer, List_Of_Game_Objects[j].meshes[i].drawInfo.indexCount, 1, List_Of_Game_Objects[j].meshes[i].drawInfo.indexOffset, 0, 0); // TODO: Part 1d, 1h
 		}
 	}
@@ -489,7 +489,7 @@ void Renderer::UpdateCamera() {
 	float KEY_mouse_x = 0;
 	float KEY_mouse_y = 0;
 
-	const float Camera_Speed = 2.0f;
+	const float Camera_Speed = 10.0f;
 	float Seconds_Passed_Since_Last_Frame = timer.Delta();
 
 	unsigned int width, height;
@@ -656,13 +656,21 @@ void Renderer::CleanUp()
 	// wait till everything has completed
 	vkDeviceWaitIdle(device);
 	// Release allocated buffers, shaders & pipeline
-	// TODO: Part 1g
-	vkDestroyBuffer(device, indexHandle, nullptr);
-	vkFreeMemory(device, indexData, nullptr);
 
 	// TODO: Part 2d
 	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
 	{
+		// TODO: Part 1g
+		vkDestroyBuffer(device, List_Of_Game_Objects[j].indexHandle, nullptr);
+		vkFreeMemory(device, List_Of_Game_Objects[j].indexData, nullptr);
+
+		vkDestroyBuffer(device, List_Of_Game_Objects[j].vertexHandle, nullptr);
+		vkFreeMemory(device, List_Of_Game_Objects[j].vertexData, nullptr);
+
+		vkDestroyDescriptorSetLayout(device, List_Of_Game_Objects[j].SB_SetLayout, nullptr);
+
+		vkDestroyDescriptorPool(device, List_Of_Game_Objects[j].SB_DescriptorPool, nullptr);
+
 		for (int i = 0; i < List_Of_Game_Objects[j].SB_Handle.size(); i++) {
 			vkDestroyBuffer(device, List_Of_Game_Objects[j].SB_Handle[i], nullptr);
 		}
@@ -672,20 +680,9 @@ void Renderer::CleanUp()
 		}
 	}
 
-	vkDestroyBuffer(device, vertexHandle, nullptr);
-	vkFreeMemory(device, vertexData, nullptr);
 	vkDestroyShaderModule(device, vertexShader, nullptr);
 	vkDestroyShaderModule(device, pixelShader, nullptr);
-	// TODO: Part 2e
-	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
-	{
-		vkDestroyDescriptorSetLayout(device, List_Of_Game_Objects[j].SB_SetLayout, nullptr);
-	}
-	// TODO: part 2f
-	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
-	{
-		vkDestroyDescriptorPool(device, List_Of_Game_Objects[j].SB_DescriptorPool, nullptr);
-	}
+
 	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 	vkDestroyPipeline(device, pipeline, nullptr);
 }
