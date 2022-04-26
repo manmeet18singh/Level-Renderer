@@ -2,7 +2,7 @@
 .vs/Assignment_1_Vulkan/v16/ipch/AutoPCH/4d7fd5b5512fc131/MAIN.ipch
 .vs/Assignment_2_Vulkan/v16/ipch/AutoPCH/8fa2b896757eafa8/MAIN.ipch
 *.ipch
-/Assets/OBJ MAT Models"
+Gateware/
 *.obj
 *.mtl
 *.mat
