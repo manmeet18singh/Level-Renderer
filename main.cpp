@@ -13,6 +13,8 @@
 #define GATEWARE_DISABLE_GOPENGLSURFACE // we have another template for this
 #include "Gateware/Gateware.h"
 #include "renderer.h"
+#include "defines.h"
+
 // open some namespaces to compact the code a bit
 using namespace GW;
 using namespace CORE;
@@ -56,7 +58,9 @@ int main()
 				if (+vulkan.StartFrame(2, clrAndDepth))
 				{
 					renderer.SignalTimer();
-					renderer.UpdateCamera();
+					INPUT_CONTROLLER input = renderer.WaitForInput();
+					renderer.LoadNewLevel(input);
+					renderer.UpdateCamera(input);
 					renderer.Render();
 					vulkan.EndFrame(true);
 				}

@@ -97,6 +97,7 @@ class Renderer
 	// TODO: Part 2b
 	SHADER_MODEL_DATA shader_model_data;
 	PUSH_CONSTANTS push_constants;
+	INPUT_CONTROLLER input_controller;
 
 	unsigned int max_active_frames;
 	// TODO: Part 4g
@@ -104,8 +105,10 @@ public:
 
 	Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GVulkanSurface _vlk);
 	void Render();
-	void UpdateCamera();
+	void UpdateCamera(INPUT_CONTROLLER input);
 	void SignalTimer();
+	INPUT_CONTROLLER WaitForInput();
+	void LoadNewLevel(INPUT_CONTROLLER input);
 
 private:
 	void CleanUp();	
@@ -116,4 +119,5 @@ private:
 	void Shutdown();
 	void ReadGameLevelFile(const char* file);
 	void LoadGameLevel();
+	std::string FileOpen();
 };

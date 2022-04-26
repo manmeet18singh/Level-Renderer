@@ -40,3 +40,27 @@ struct GAMEOBJECT {
 	std::vector<H2B::BATCH> batches;
 	std::vector<H2B::MESH> meshes;
 };
+
+struct INPUT_CONTROLLER
+{
+	float INPUT_spc = 0;
+	float INPUT_lShift = 0;
+	float INPUT_lCtrl = 0;
+
+	float INPUT_w = 0;
+	float INPUT_s = 0;
+	float INPUT_d = 0;
+	float INPUT_a = 0;
+	float INPUT_o = 0;
+
+	float CINPUT_rTrigger = 0;
+	float CINPUT_lTrigger = 0;
+	float CINPUT_lStick_y = 0;
+	float CINPUT_lStick_x = 0;
+	float CINPUT_rStick_y = 0;
+	float CINPUT_rStick_x = 0;
+	float CINPUT_start = 0;
+
+	float INPUT_mouse_x = 0;
+	float INPUT_mouse_y = 0;
+};

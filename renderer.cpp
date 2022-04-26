@@ -1,5 +1,6 @@
 #include "renderer.h"
 #include "h2bParser.h"
+#include <windows.h>
 #include <iostream>
 #include <fstream>
 
@@ -20,7 +21,7 @@ Renderer::Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GVulkanSurface _vlk)
 	PROXY_controller.Create();
 
 	//Load in default level
-	ReadGameLevelFile("../Assets/GameLevel2.txt");
+	ReadGameLevelFile("../Assets/GameLevel.txt");
 	LoadGameLevel();
 
 	InitContent();
@@ -87,9 +88,6 @@ void Renderer::InitContent()
 	VkPhysicalDevice physicalDevice = nullptr;
 	vlk.GetDevice((void**)&device);
 	vlk.GetPhysicalDevice((void**)&physicalDevice);
-
-	// TODO: Part 1c
-	// Create Vertex Buffer
 
 	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
 	{
@@ -463,7 +461,111 @@ void Renderer::Render() {
 
 }
 
-void Renderer::UpdateCamera() {
+INPUT_CONTROLLER Renderer::WaitForInput() {
+	INPUT_CONTROLLER input = {};
+
+	PROXY_input.GetState(G_KEY_SPACE, input.INPUT_spc);
+	PROXY_input.GetState(G_KEY_LEFTSHIFT, input.INPUT_lShift);
+
+	PROXY_input.GetState(G_KEY_W, input.INPUT_w);
+	PROXY_input.GetState(G_KEY_S, input.INPUT_s);
+	PROXY_input.GetState(G_KEY_D, input.INPUT_d);
+	PROXY_input.GetState(G_KEY_A, input.INPUT_a);
+
+	//New File
+	PROXY_input.GetState(G_KEY_O, input.INPUT_o);
+	PROXY_input.GetState(G_KEY_LEFTCONTROL, input.INPUT_lCtrl);
+	PROXY_controller.GetState(0, G_START_BTN, input.CINPUT_start);
+
+	GW::GReturn result = PROXY_input.GetMouseDelta(input.INPUT_mouse_x, input.INPUT_mouse_y);
+	if (!G_PASS(result) || result == GW::GReturn::REDUNDANT)
+	{
+		input.INPUT_mouse_x = 0;
+		input.INPUT_mouse_y = 0;
+	}
+
+	PROXY_controller.GetState(0, G_RIGHT_TRIGGER_AXIS, input.CINPUT_rTrigger);
+	PROXY_controller.GetState(0, G_LEFT_TRIGGER_AXIS, input.CINPUT_lTrigger);
+
+	PROXY_controller.GetState(0, G_LY_AXIS, input.CINPUT_lStick_y);
+	PROXY_controller.GetState(0, G_LX_AXIS, input.CINPUT_lStick_x);
+
+	PROXY_controller.GetState(0, G_RY_AXIS, input.CINPUT_rStick_y);
+	PROXY_controller.GetState(0, G_RX_AXIS, input.CINPUT_rStick_x);
+
+	return input;
+}
+
+std::string Renderer::FileOpen()
+{
+	OPENFILENAMEW open;
+	memset(&open, 0, sizeof(open));
+	
+	wchar_t filename[MAX_PATH];
+	filename[0] = L'\0';
+
+	open.lStructSize = sizeof(OPENFILENAMEW);
+	open.lpstrFile = filename;
+	open.nMaxFile = MAX_PATH;
+	open.lpstrFilter = L"All\0*.*\0Text\0*.txt\0";
+	open.nFilterIndex = 2;
+	open.lpstrFileTitle = L"Load New Level From .txt File";
+	open.lpstrInitialDir = NULL;
+	open.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+	if (GetOpenFileName(&open) == TRUE)
+	{
+		std::wstring file = open.lpstrFile;
+		return std::string(file.begin(), file.end());
+	}
+	return "";
+}
+
+void Renderer::LoadNewLevel(INPUT_CONTROLLER input) {
+	
+	//push lctrl and o to open file dialog
+	if (input.INPUT_o == 0 || input.INPUT_lCtrl == 0) {
+		return;
+	}
+
+	//if (input.CINPUT_start == 0 ) {
+	//	return;
+	//}
+
+	std::string newPath = FileOpen();
+
+	if (newPath == "") return;
+
+	CleanUp();
+
+	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
+	{
+		List_Of_Game_Objects[j].SB_Handle.clear();
+		List_Of_Game_Objects[j].SB_Data.clear();
+		List_Of_Game_Objects[j].SB_DescriptorSet.clear();
+		List_Of_Game_Objects[j].vertices.clear();
+		List_Of_Game_Objects[j].indices.clear();
+		List_Of_Game_Objects[j].materials.clear();
+		List_Of_Game_Objects[j].batches.clear();
+		List_Of_Game_Objects[j].meshes.clear();
+
+	}
+
+	List_Of_Game_Objects.clear();
+
+	unsigned int width, height;
+	win.GetClientWidth(width);
+	win.GetClientHeight(height);
+
+	ReadGameLevelFile(newPath.c_str());
+	LoadGameLevel();
+
+	InitContent();
+	InitShader();
+	InitPipeline(width, height);
+}
+
+void Renderer::UpdateCamera(INPUT_CONTROLLER input) {
 
 	// TODO: Part 4c
 	GW::MATH::GMATRIXF Camera;
@@ -471,22 +573,7 @@ void Renderer::UpdateCamera() {
 	PROXY_matrix.InverseF(MATRIX_View, Camera);
 
 	// TODO: Part 4d
-	float KEY_spc = 0;
-	float KEY_lShift = 0;
-	float KEY_rTrigger = 0;
-	float KEY_lTrigger = 0;
 
-	float KEY_w = 0;
-	float KEY_s = 0;
-	float KEY_d = 0;
-	float KEY_a = 0;
-	float KEY_lStick_y = 0;
-	float KEY_lStick_x = 0;
-	float KEY_rStick_y = 0;
-	float KEY_rStick_x = 0;
-
-	float KEY_mouse_x = 0;
-	float KEY_mouse_y = 0;
 
 	const float Camera_Speed = 10.0f;
 	float Seconds_Passed_Since_Last_Frame = timer.Delta();
@@ -498,47 +585,23 @@ void Renderer::UpdateCamera() {
 	float aspect;
 	vlk.GetAspectRatio(aspect);
 
-	PROXY_input.GetState(G_KEY_SPACE, KEY_spc);
-	PROXY_input.GetState(G_KEY_LEFTSHIFT, KEY_lShift);
-
-	PROXY_input.GetState(G_KEY_W, KEY_w);
-	PROXY_input.GetState(G_KEY_S, KEY_s);
-	PROXY_input.GetState(G_KEY_D, KEY_d);
-	PROXY_input.GetState(G_KEY_A, KEY_a);
-
-	GW::GReturn result = PROXY_input.GetMouseDelta(KEY_mouse_x, KEY_mouse_y);
-	if (!G_PASS(result) || result == GW::GReturn::REDUNDANT)
-	{
-		KEY_mouse_x = 0;
-		KEY_mouse_y = 0;
-	}
-
-	PROXY_controller.GetState(0, G_RIGHT_TRIGGER_AXIS, KEY_rTrigger);
-	PROXY_controller.GetState(0, G_LEFT_TRIGGER_AXIS, KEY_lTrigger);
-
-	PROXY_controller.GetState(0, G_LY_AXIS, KEY_lStick_y);
-	PROXY_controller.GetState(0, G_LX_AXIS, KEY_lStick_x);
-
-	PROXY_controller.GetState(0, G_RY_AXIS, KEY_rStick_y);
-	PROXY_controller.GetState(0, G_RX_AXIS, KEY_rStick_x);
-
 	// TODO: Part 4e
 	float Per_Frame_Speed = Camera_Speed * Seconds_Passed_Since_Last_Frame;
 
-	float Total_Y_Change = KEY_spc - KEY_lShift + KEY_rTrigger - KEY_lTrigger;
-	float Total_Z_Change = KEY_w - KEY_s + KEY_lStick_y;
-	float Total_X_Change = KEY_d - KEY_a + KEY_lStick_x;
+	float Total_Y_Change = input.INPUT_spc - input.INPUT_lShift + input.CINPUT_rTrigger - input.CINPUT_lTrigger;
+	float Total_Z_Change = input.INPUT_w - input.INPUT_s + input.CINPUT_lStick_y;
+	float Total_X_Change = input.INPUT_d - input.INPUT_a + input.CINPUT_lStick_x;
 
 	PROXY_matrix.TranslateLocalF(Camera, GW::MATH::GVECTORF{ Total_X_Change * Per_Frame_Speed , Total_Y_Change * Per_Frame_Speed , Total_Z_Change * Per_Frame_Speed }, Camera);
 
 	float Thumb_Speed = G_PI * Seconds_Passed_Since_Last_Frame;
 
-	float Total_Pitch = G_DEGREE_TO_RADIAN(65) * KEY_mouse_y / height + KEY_rStick_y * -Thumb_Speed;
+	float Total_Pitch = G_DEGREE_TO_RADIAN(65) * input.INPUT_mouse_y / height + input.CINPUT_rStick_y * -Thumb_Speed;
 	GW::MATH::GMATRIXF Pitch_Mat = GW::MATH::GIdentityMatrixF;
 	PROXY_matrix.RotationYawPitchRollF(0, Total_Pitch, 0, Pitch_Mat);
 
 
-	float Total_Yaw = G_DEGREE_TO_RADIAN(65) * aspect * KEY_mouse_x / width + KEY_rStick_x * Thumb_Speed;
+	float Total_Yaw = G_DEGREE_TO_RADIAN(65) * aspect * input.INPUT_mouse_x / width + input.CINPUT_rStick_x * Thumb_Speed;
 	GW::MATH::GMATRIXF Yaw_Mat = GW::MATH::GIdentityMatrixF;
 	PROXY_matrix.RotationYawPitchRollF(Total_Yaw, 0, 0, Yaw_Mat);
 
