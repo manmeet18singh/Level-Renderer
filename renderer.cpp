@@ -1,6 +1,5 @@
 #include "renderer.h"
 #include "h2bParser.h"
-//#include "Assets/FSLogo/FSLogo.h"
 #include <iostream>
 #include <fstream>
 
@@ -21,7 +20,7 @@ Renderer::Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GVulkanSurface _vlk)
 	PROXY_controller.Create();
 
 	//Load in default level
-	ReadGameLevelFile("Assets/GameLevel.txt");
+	ReadGameLevelFile("../Assets/GameLevel2.txt");
 	LoadGameLevel();
 
 	InitContent();
@@ -136,7 +135,7 @@ void Renderer::InitShader()
 	shaderc_compile_options_set_generate_debug_info(options);
 #endif
 	// Create Vertex Shader
-	std::string Vertex_Shader_String = ShaderAsString("VS.hlsl");
+	std::string Vertex_Shader_String = ShaderAsString("../Shaders/VS.hlsl");
 
 	shaderc_compilation_result_t result = shaderc_compile_into_spv( // compile
 		compiler, Vertex_Shader_String.c_str(), strlen(Vertex_Shader_String.c_str()),
@@ -148,7 +147,7 @@ void Renderer::InitShader()
 	shaderc_result_release(result); // done
 
 	// Create Pixel Shader
-	std::string Pixel_Shader_String = ShaderAsString("PS.hlsl");
+	std::string Pixel_Shader_String = ShaderAsString("../Shaders/PS.hlsl");
 
 	result = shaderc_compile_into_spv( // compile
 		compiler, Pixel_Shader_String.c_str(), strlen(Pixel_Shader_String.c_str()),
@@ -578,6 +577,7 @@ void Renderer::ReadGameLevelFile(const char* levelFilePath) {
 
 	if (level.is_open() == false) {
 		std::cout << "ERROR: Level Source File \"" << levelFilePath << "\" Not Found!" << std::endl;
+		throw std::runtime_error("");
 		return;
 	}
 
@@ -630,7 +630,7 @@ void Renderer::LoadGameLevel() {
 
 	for (int i = 0; i < List_Of_Game_Objects.size(); i++)
 	{
-		if (currObj.Parse(std::string("Assets/H2B Models/" + List_Of_Game_Objects[i].name + ".h2b").c_str())) {
+		if (currObj.Parse(std::string("../Assets/H2B Models/" + List_Of_Game_Objects[i].name + ".h2b").c_str())) {
 
 			List_Of_Game_Objects[i].vertexCount = currObj.vertexCount;
 			List_Of_Game_Objects[i].indexCount = currObj.indexCount;
@@ -645,7 +645,7 @@ void Renderer::LoadGameLevel() {
 
 		}
 		else {
-			std::cout << "Error loading model: " + List_Of_Game_Objects[i].name + ".h2b" << std::endl;
+			throw std::runtime_error("Error loading model: " + List_Of_Game_Objects[i].name + ".h2b");
 		}
 	}
 
