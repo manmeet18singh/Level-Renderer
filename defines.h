@@ -52,12 +52,17 @@ struct INPUT_CONTROLLER
 	float INPUT_spc = 0;
 	float INPUT_lShift = 0;
 	float INPUT_lCtrl = 0;
+	float INPUT_up = 0;
+	float INPUT_down = 0;
+	float INPUT_enter = 0;
 
 	float INPUT_w = 0;
 	float INPUT_s = 0;
 	float INPUT_d = 0;
 	float INPUT_a = 0;
 	float INPUT_o = 0;
+	float INPUT_1 = 0;
+	float INPUT_2 = 0;
 
 	float CINPUT_rTrigger = 0;
 	float CINPUT_lTrigger = 0;
@@ -65,7 +70,6 @@ struct INPUT_CONTROLLER
 	float CINPUT_lStick_x = 0;
 	float CINPUT_rStick_y = 0;
 	float CINPUT_rStick_x = 0;
-	float CINPUT_start = 0;
 
 	float INPUT_mouse_x = 0;
 	float INPUT_mouse_y = 0;

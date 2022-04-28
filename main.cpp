@@ -4,6 +4,7 @@
 #define GATEWARE_ENABLE_SYSTEM // Graphics libs require system level libraries
 #define GATEWARE_ENABLE_GRAPHICS // Enables all Graphics Libraries
 #define GATEWARE_ENABLE_MATH // Enables all Math
+#define GATEWARE_ENABLE_AUDIO // Enables all audio
 // TODO: Part 3a
 #define GATEWARE_ENABLE_INPUT
 // Ignore some GRAPHICS libraries we aren't going to use
@@ -29,7 +30,7 @@ int main()
 	if (+win.Create(0, 0, 800, 600, GWindowStyle::WINDOWEDBORDERED))
 	{
 		// TODO: Part 1a
-		win.SetWindowName("Manmeet Singh - Assignment 2 - VULKAN");
+		win.SetWindowName("Manmeet Singh - Level Renderer - VULKAN");
 		VkClearValue clrAndDepth[2];
 		clrAndDepth[0].color = { {0.341f, 0.262f, 0.356f, 1.0f} };
 		clrAndDepth[1].depthStencil = { 1.0f, 0u };
@@ -58,8 +59,9 @@ int main()
 				if (+vulkan.StartFrame(2, clrAndDepth))
 				{
 					renderer.SignalTimer();
-					INPUT_CONTROLLER input = renderer.WaitForInput();
+					INPUT_CONTROLLER input = renderer.GetInput();
 					renderer.LoadNewLevel(input);
+					renderer.AudioController(input);
 					renderer.UpdateCamera(input);
 					renderer.Render();
 					vulkan.EndFrame(true);

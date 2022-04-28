@@ -5,6 +5,7 @@
 #define GATEWARE_ENABLE_SYSTEM // Graphics libs require system level libraries
 #define GATEWARE_ENABLE_GRAPHICS // Enables all Graphics Libraries
 #define GATEWARE_ENABLE_MATH // Enables all Math
+#define GATEWARE_ENABLE_AUDIO // Enables all audio
 // TODO: Part 3a
 #define GATEWARE_ENABLE_INPUT
 // Ignore some GRAPHICS libraries we aren't going to use
@@ -35,7 +36,7 @@ class Renderer
 	struct SHADER_MODEL_DATA
 	{
 		GW::MATH::GVECTORF SunDirection, SunColor, SunAmbient, CamPos;
-		GW::MATH::GMATRIXF ViewMatrix, ProjectionMatrix;
+		GW::MATH::GMATRIXF ViewMatrix[2], ProjectionMatrix;
 
 		GW::MATH::GMATRIXF matricies[MAX_SUBMESH_PER_DRAW];
 		H2B::ATTRIBUTES materials[MAX_SUBMESH_PER_DRAW];
@@ -43,8 +44,8 @@ class Renderer
 
 	struct PUSH_CONSTANTS
 	{
-		unsigned model_Index, material_Index;
-		int padding[30] = {};
+		unsigned model_Index, material_Index, camera_Index;
+		int padding[29] = {};
 	};
 
 	// proxy handles
@@ -86,9 +87,12 @@ class Renderer
 	GW::MATH::GVector PROXY_vector;
 	GW::INPUT::GInput PROXY_input;
 	GW::INPUT::GController PROXY_controller;
+	GW::AUDIO::GAudio PROXY_audio;
+	GW::AUDIO::GMusic PROXY_music;
+	GW::AUDIO::GSound PROXY_sound;
 
 	GW::MATH::GMATRIXF MATRIX_World;
-	GW::MATH::GMATRIXF MATRIX_View;
+	std::vector <GW::MATH::GMATRIXF> MATRIX_View;
 	GW::MATH::GMATRIXF MATRIX_Projection;
 	GW::MATH::GVECTORF VECTOR_Light_Direction;
 	GW::MATH::GVECTORF VECTOR_Light_Color;
@@ -99,6 +103,7 @@ class Renderer
 	PUSH_CONSTANTS push_constants;
 	INPUT_CONTROLLER input_controller;
 
+	float volume = 1.0f;
 	unsigned int max_active_frames;
 	// TODO: Part 4g
 public:
@@ -107,7 +112,8 @@ public:
 	void Render();
 	void UpdateCamera(INPUT_CONTROLLER input);
 	void SignalTimer();
-	INPUT_CONTROLLER WaitForInput();
+	INPUT_CONTROLLER GetInput();
+	void AudioController(INPUT_CONTROLLER input);
 	void LoadNewLevel(INPUT_CONTROLLER input);
 
 private:

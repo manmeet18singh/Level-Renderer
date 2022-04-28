@@ -6,6 +6,7 @@ cbuffer MESH_INDEX
 {   
     uint model_ID;
     uint material_ID;
+    uint camera_ID;
 };
 
 struct OBJ_ATTRIBUTES
@@ -25,7 +26,7 @@ struct OBJ_ATTRIBUTES
 struct SHADER_MODEL_DATA
 {
     float4 SunDirection, SunColor, SunAmbient, CamPos;
-    matrix ViewMatrix, ProjectionMatrix;
+    matrix ViewMatrix[2], ProjectionMatrix;
 
     matrix matricies[MAX_SUBMESH_PER_DRAW];
     OBJ_ATTRIBUTES materials[MAX_SUBMESH_PER_DRAW];
@@ -58,7 +59,7 @@ PS_INPUT main(VS_INPUT input)
     output.Pos = mul(output.Pos, SceneData[0].matricies[model_ID]);
     output.PosW = output.Pos.xyz;
     
-    output.Pos = mul(output.Pos, SceneData[0].ViewMatrix);
+    output.Pos = mul(output.Pos, SceneData[0].ViewMatrix[camera_ID]);
     output.Pos = mul(output.Pos, SceneData[0].ProjectionMatrix);
 
     return output;

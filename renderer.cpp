@@ -19,6 +19,10 @@ Renderer::Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GVulkanSurface _vlk)
 	PROXY_vector.Create();
 	PROXY_input.Create(win);
 	PROXY_controller.Create();
+	PROXY_audio.Create();
+	PROXY_music.Create("../Assets/Powerbroker.wav", PROXY_audio, volume);
+	PROXY_music.Play(true);
+	PROXY_sound.Create("../Assets/Pew.wav", PROXY_audio);
 
 	//Load in default level
 	ReadGameLevelFile("../Assets/GameLevel.txt");
@@ -33,12 +37,19 @@ Renderer::Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GVulkanSurface _vlk)
 void Renderer::InitContent()
 {
 	//TODO ROTATE ON Y OVER TIME
+	MATRIX_View.resize(2);
 
-	GW::MATH::GVECTORF Eye = {-30.0f, 20.0f, 10.0f };
+	GW::MATH::GVECTORF Eye = { -30.0f, 20.0f, 10.0f };
 	GW::MATH::GVECTORF At = { 0.0f, 0.0f, 0.0f };
 	GW::MATH::GVECTORF Up = { 0.0f, 1.0f, 0.0f };
 
-	PROXY_matrix.LookAtLHF(Eye, At, Up, MATRIX_View);
+	PROXY_matrix.LookAtLHF(Eye, At, Up, MATRIX_View[0]);
+
+	GW::MATH::GVECTORF MiniEye = { -30.0f, 35.0f, 15.0f };
+	GW::MATH::GVECTORF MiniAt = { -5.0f, 0.0f, 15.0f };
+	GW::MATH::GVECTORF MiniUp = { 0.0f, 1.0f, 0.0f };
+
+	PROXY_matrix.LookAtLHF(MiniEye, MiniAt, MiniUp, MATRIX_View[1]);
 
 	float aspect;
 	vlk.GetAspectRatio(aspect);
@@ -46,7 +57,6 @@ void Renderer::InitContent()
 	PROXY_matrix.ProjectionVulkanLHF(G_DEGREE_TO_RADIAN(65), aspect, 0.1f, 100.0f, MATRIX_Projection);
 
 	// TODO: Part 2b
-	shader_model_data.ViewMatrix = MATRIX_View;
 	shader_model_data.ProjectionMatrix = MATRIX_Projection;
 
 	shader_model_data.SunColor = VECTOR_Light_Color;
@@ -406,10 +416,6 @@ void Renderer::Shutdown()
 }
 
 void Renderer::Render() {
-	// TODO: Part 2a
-
-	shader_model_data.ViewMatrix = MATRIX_View;
-
 	// grab the current Vulkan commandBuffer
 	unsigned int currentBuffer;
 	vlk.GetSwapchainCurrentImage(currentBuffer);
@@ -420,57 +426,102 @@ void Renderer::Render() {
 	win.GetClientWidth(width);
 	win.GetClientHeight(height);
 	// setup the pipeline's dynamic settings
-	VkViewport viewport = {
-		0, 0, static_cast<float>(width), static_cast<float>(height), 0, 1
+	VkViewport viewport[2] = {
+		{ 0, 0, static_cast<float>(width), static_cast<float>(height), 0, 1 },
+		{ 0, 0, static_cast<float>(width) / 3 , static_cast<float>(height) / 3 , 0, .25 }
 	};
 	VkRect2D scissor = { {0, 0}, {width, height} };
-	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
-
-
 	// TODO: Part 3b
-		// TODO: Part 3d
-	for (int j = 0; j < List_Of_Game_Objects.size(); j++)
+	// TODO: Part 3d
+
+	for (int cam = 0; cam < MATRIX_View.size(); cam++)
 	{
-		// now we can draw
-		VkDeviceSize offsets[] = { 0 };
-		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &List_Of_Game_Objects[j].vertexHandle, offsets);
-		// TODO: Part 1h
-		vkCmdBindIndexBuffer(commandBuffer, List_Of_Game_Objects[j].indexHandle, *offsets, VK_INDEX_TYPE_UINT32);
-		// TODO: Part 2i
-		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &List_Of_Game_Objects[j].SB_DescriptorSet[currentBuffer], 0, VK_NULL_HANDLE);
+		shader_model_data.ViewMatrix[cam] = MATRIX_View[cam];
+		push_constants.camera_Index = cam;
+		vkCmdSetViewport(commandBuffer, 0, 1, &viewport[cam]);
 
-		// TODO: Part 4d
-		GvkHelper::write_to_buffer(device, List_Of_Game_Objects[j].SB_Data[currentBuffer], &shader_model_data, sizeof(shader_model_data));
-		for (int i = 0; i < List_Of_Game_Objects[j].meshCount; i++) {
+		for (int j = 0; j < List_Of_Game_Objects.size(); j++)
+		{
+			// now we can draw
+			VkDeviceSize offsets[] = { 0 };
+			vkCmdBindVertexBuffers(commandBuffer, 0, 1, &List_Of_Game_Objects[j].vertexHandle, offsets);
+			// TODO: Part 1h
+			vkCmdBindIndexBuffer(commandBuffer, List_Of_Game_Objects[j].indexHandle, *offsets, VK_INDEX_TYPE_UINT32);
+			// TODO: Part 2i
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &List_Of_Game_Objects[j].SB_DescriptorSet[currentBuffer], 0, VK_NULL_HANDLE);
 
-			push_constants.material_Index = List_Of_Game_Objects[j].matOffset + List_Of_Game_Objects[j].meshes[i].materialIndex;
-			push_constants.model_Index = j;
+			// TODO: Part 4d
+			GvkHelper::write_to_buffer(device, List_Of_Game_Objects[j].SB_Data[currentBuffer], &shader_model_data, sizeof(shader_model_data));
+			for (int i = 0; i < List_Of_Game_Objects[j].meshCount; i++) {
 
-			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(push_constants), &push_constants);
-			vkCmdDrawIndexed(commandBuffer, List_Of_Game_Objects[j].meshes[i].drawInfo.indexCount, 1, List_Of_Game_Objects[j].meshes[i].drawInfo.indexOffset, 0, 0); // TODO: Part 1d, 1h
+				push_constants.material_Index = List_Of_Game_Objects[j].matOffset + List_Of_Game_Objects[j].meshes[i].materialIndex;
+				push_constants.model_Index = j;
+
+				vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(push_constants), &push_constants);
+				vkCmdDrawIndexed(commandBuffer, List_Of_Game_Objects[j].meshes[i].drawInfo.indexCount, 1, List_Of_Game_Objects[j].meshes[i].drawInfo.indexOffset, 0, 0); // TODO: Part 1d, 1h
+			}
 		}
 	}
 
 }
 
-INPUT_CONTROLLER Renderer::WaitForInput() {
+void Renderer::AudioController(INPUT_CONTROLLER input) {
+	//std::cout << "WHAT THE FUCK IS GOING ON " << std::endl;
+	bool isPlaying;
+	PROXY_music.isPlaying(isPlaying);
+
+	//Pause
+	if (input.INPUT_1 != 0 && isPlaying) {
+		PROXY_music.Pause();
+	}
+	//Resume
+	if (input.INPUT_2 != 0 && !isPlaying) {
+		PROXY_music.Resume();
+	}
+	//Vol Up
+	if (input.INPUT_up != 0) {
+		if (volume < 1.0f) {
+			volume += 0.001f;
+			PROXY_music.SetVolume(volume);
+		}
+	}
+	//Vol Down
+	if (input.INPUT_down != 0) {
+		if (volume > 0.0f)
+		{
+			volume -= 0.001f;
+			PROXY_music.SetVolume(volume);
+		}
+	}
+	//Pew
+	if (input.INPUT_enter != 0) {
+		PROXY_sound.Play();
+	}
+}
+
+INPUT_CONTROLLER Renderer::GetInput() {
 	INPUT_CONTROLLER input = {};
 
 	PROXY_input.GetState(G_KEY_SPACE, input.INPUT_spc);
 	PROXY_input.GetState(G_KEY_LEFTSHIFT, input.INPUT_lShift);
+	PROXY_input.GetState(G_KEY_UP, input.INPUT_up);
+	PROXY_input.GetState(G_KEY_DOWN, input.INPUT_down);
+	PROXY_input.GetState(G_KEY_ENTER, input.INPUT_enter);
+
 
 	PROXY_input.GetState(G_KEY_W, input.INPUT_w);
 	PROXY_input.GetState(G_KEY_S, input.INPUT_s);
 	PROXY_input.GetState(G_KEY_D, input.INPUT_d);
 	PROXY_input.GetState(G_KEY_A, input.INPUT_a);
+	PROXY_input.GetState(G_KEY_1, input.INPUT_1);
+	PROXY_input.GetState(G_KEY_2, input.INPUT_2);
 
 	//New File
 	PROXY_input.GetState(G_KEY_O, input.INPUT_o);
 	PROXY_input.GetState(G_KEY_LEFTCONTROL, input.INPUT_lCtrl);
-	PROXY_controller.GetState(0, G_START_BTN, input.CINPUT_start);
 
 	GW::GReturn result = PROXY_input.GetMouseDelta(input.INPUT_mouse_x, input.INPUT_mouse_y);
 	if (!G_PASS(result) || result == GW::GReturn::REDUNDANT)
@@ -495,7 +546,7 @@ std::string Renderer::FileOpen()
 {
 	OPENFILENAMEW open;
 	memset(&open, 0, sizeof(open));
-	
+
 	wchar_t filename[MAX_PATH];
 	filename[0] = L'\0';
 
@@ -517,7 +568,7 @@ std::string Renderer::FileOpen()
 }
 
 void Renderer::LoadNewLevel(INPUT_CONTROLLER input) {
-	
+
 	//push lctrl and o to open file dialog
 	if (input.INPUT_o == 0 || input.INPUT_lCtrl == 0) {
 		return;
@@ -565,10 +616,12 @@ void Renderer::UpdateCamera(INPUT_CONTROLLER input) {
 	// TODO: Part 4c
 	GW::MATH::GMATRIXF Camera;
 
-	PROXY_matrix.InverseF(MATRIX_View, Camera);
+	// Rotate Mini Map
+	PROXY_matrix.RotateYLocalF(MATRIX_View[1], timer.Delta() * 0.5f, MATRIX_View[1]);
+
+	PROXY_matrix.InverseF(MATRIX_View[0], Camera);
 
 	// TODO: Part 4d
-
 
 	const float Camera_Speed = 10.0f;
 	float Seconds_Passed_Since_Last_Frame = timer.Delta();
@@ -606,7 +659,7 @@ void Renderer::UpdateCamera(INPUT_CONTROLLER input) {
 	Camera.row4 = Save_Pos;
 
 	// TODO: Part 4c		
-	PROXY_matrix.InverseF(Camera, MATRIX_View);
+	PROXY_matrix.InverseF(Camera, MATRIX_View[0]);
 }
 
 void Renderer::SignalTimer()
@@ -685,7 +738,7 @@ void Renderer::ReadGameLevelFile(const char* levelFilePath) {
 
 			std::getline(level, currLine); //Grab the next line
 			std::string lightName = currLine.substr(0, currLine.find('.')); //grab the name of the mesh, ignore .xxx number for duplicates
-			
+
 			GW::MATH::GVECTORF lightDir;
 
 			GW::MATH::GMATRIXF objPos;
@@ -701,7 +754,7 @@ void Renderer::ReadGameLevelFile(const char* levelFilePath) {
 
 				if (i == 0) {
 
-					VECTOR_Light_Color = { x, y, z, w };
+					VECTOR_Light_Color = { x, y, z, 1.0f };
 				}
 
 				if (i == 3) {
@@ -712,7 +765,7 @@ void Renderer::ReadGameLevelFile(const char* levelFilePath) {
 					std::cout << "error reading matrix";
 				}
 			}
-			
+
 		}
 	}
 
