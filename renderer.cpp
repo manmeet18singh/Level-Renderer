@@ -138,7 +138,7 @@ void Renderer::InitShader()
 	shaderc_compile_options_set_generate_debug_info(options);
 #endif
 	// Create Vertex Shader
-	std::string Vertex_Shader_String = ShaderAsString("../Shaders/VS.hlsl");
+	std::string Vertex_Shader_String = ShaderAsString("../VS.hlsl");
 
 	shaderc_compilation_result_t result = shaderc_compile_into_spv( // compile
 		compiler, Vertex_Shader_String.c_str(), strlen(Vertex_Shader_String.c_str()),
@@ -150,7 +150,7 @@ void Renderer::InitShader()
 	shaderc_result_release(result); // done
 
 	// Create Pixel Shader
-	std::string Pixel_Shader_String = ShaderAsString("../Shaders/PS.hlsl");
+	std::string Pixel_Shader_String = ShaderAsString("../PS.hlsl");
 
 	result = shaderc_compile_into_spv( // compile
 		compiler, Pixel_Shader_String.c_str(), strlen(Pixel_Shader_String.c_str()),
