@@ -55,7 +55,7 @@ void Renderer::InitContent()
 	// TODO: Part 4g
 	shader_model_data.CamPos = Eye;
 
-	VECTOR_Ambient = { 0.15f, 0.15f, 0.25f, 1.0f };
+	VECTOR_Ambient = { 0.25f, 0.25f, 0.35f, 1.0f };
 	shader_model_data.SunAmbient = VECTOR_Ambient;
 	// TODO: part 3b
 
