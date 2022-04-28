@@ -45,7 +45,9 @@ float4 main(PS_INPUT input) : SV_TARGET
 {
     input.Norm = normalize(input.Norm);
     
-    float lightRatio = clamp(dot(-SceneData[0].SunDirection.xyz, input.Norm), 0, 1);
+    float3 lightDir = normalize(SceneData[0].SunDirection.xyz - input.PosW.xyz);
+    
+    float lightRatio = clamp(dot(lightDir, input.Norm), 0, 1);
     
     lightRatio += SceneData[0].SunAmbient;
     

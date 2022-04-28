@@ -45,10 +45,7 @@ void Renderer::InitContent()
 
 	PROXY_matrix.ProjectionVulkanLHF(G_DEGREE_TO_RADIAN(65), aspect, 0.1f, 100.0f, MATRIX_Projection);
 
-	GW::MATH::GVECTORF lightDir = { -1.0f, -1.0f, 2.0f, 0.0f };
-	PROXY_vector.NormalizeF(lightDir, VECTOR_Light_Direction);
-
-	VECTOR_Light_Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	VECTOR_Light_Color = { 0.9f, 0.9f, 1.0f, 1.0f };
 
 	// TODO: Part 2b
 	shader_model_data.ViewMatrix = MATRIX_View;
@@ -60,7 +57,7 @@ void Renderer::InitContent()
 	// TODO: Part 4g
 	shader_model_data.CamPos = Eye;
 
-	VECTOR_Ambient = { 0.25f, 0.25f, 0.35f, 1.0f };
+	VECTOR_Ambient = { 0.15f, 0.15f, 0.25f, 1.0f };
 	shader_model_data.SunAmbient = VECTOR_Ambient;
 	// TODO: part 3b
 
@@ -686,13 +683,14 @@ void Renderer::ReadGameLevelFile(const char* levelFilePath) {
 			obj2save.worldMatrix = objPos;
 			List_Of_Game_Objects.push_back(obj2save);
 		}
-		
 		if (currLine == "LIGHT") {
+
 			std::getline(level, currLine); //Grab the next line
 			std::string lightName = currLine.substr(0, currLine.find('.')); //grab the name of the mesh, ignore .xxx number for duplicates
-			light2save.name = lightName;
+			
+			GW::MATH::GVECTORF lightDir;
 
-			GW::MATH::GMATRIXF lightPos;
+			GW::MATH::GMATRIXF objPos;
 
 			for (int i = 0; i < 4; i++)
 			{
@@ -703,24 +701,15 @@ void Renderer::ReadGameLevelFile(const char* levelFilePath) {
 
 				int scan = std::sscanf(posVal.c_str(), "(%f, %f, %f, %f)", &x, &y, &z, &w);
 
-				if (i == 0) {
-					lightPos.row1 = { x, y, z, w };
-				}
-				else if (i == 1) {
-					lightPos.row2 = { x, y, z, w };
-				}
-				else if (i == 2) {
-					lightPos.row3 = { x, y, z, w };
-				}
-				else if (i == 3) {
-					lightPos.row4 = { x, y, z, w };
+				if (i == 3) {
+
+					VECTOR_Light_Direction = { x, y, z, w };
 				}
 				else if (scan == 0 || scan == EOF) {
 					std::cout << "error reading matrix";
 				}
 			}
-			light2save.worldMatrix = lightPos;
-			List_Of_Lights.push_back(light2save);
+			
 		}
 	}
 

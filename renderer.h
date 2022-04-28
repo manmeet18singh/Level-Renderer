@@ -56,7 +56,6 @@ class Renderer
 
 	//Save all the models into this list
 	std::vector<GAMEOBJECT> List_Of_Game_Objects;
-	std::vector<LIGHT> List_Of_Lights;
 
 	// what we need at a minimum to draw a triangle
 	VkDevice device = nullptr;
