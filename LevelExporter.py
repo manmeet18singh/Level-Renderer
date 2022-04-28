@@ -45,6 +45,10 @@ def print_heir(ob, levels=10):
         # flip the local Z axis for winding and transpose for export
         scaleZ = mathutils.Matrix.Scale(-1.0, 4, (0.0, 0.0, 1.0))
         converted = scaleZ.transposed() @ converted  
+
+        if(ob.type == "LIGHT"):
+            converted[0][0:3] = ob.data.color[0], ob.data.color[1], ob.data.color[2]
+
         file.write(spaces + str(converted) + "\n")
          
         # TODO: For a game ready exporter we would

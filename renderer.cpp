@@ -45,8 +45,6 @@ void Renderer::InitContent()
 
 	PROXY_matrix.ProjectionVulkanLHF(G_DEGREE_TO_RADIAN(65), aspect, 0.1f, 100.0f, MATRIX_Projection);
 
-	VECTOR_Light_Color = { 0.9f, 0.9f, 1.0f, 1.0f };
-
 	// TODO: Part 2b
 	shader_model_data.ViewMatrix = MATRIX_View;
 	shader_model_data.ProjectionMatrix = MATRIX_Projection;
@@ -700,6 +698,11 @@ void Renderer::ReadGameLevelFile(const char* levelFilePath) {
 				float x, y, z, w;
 
 				int scan = std::sscanf(posVal.c_str(), "(%f, %f, %f, %f)", &x, &y, &z, &w);
+
+				if (i == 0) {
+
+					VECTOR_Light_Color = { x, y, z, w };
+				}
 
 				if (i == 3) {
 
