@@ -31,7 +31,7 @@ Level Renderer created for the class Project and Portfolio IV at Full Sail Unive
 2.  Download and unzip the repository files or clone using the command `https://github.com/manmeet18singh/Project-And-Portfolio.git`
 3.  Run the CMake command: `cmake -S ./ -B ./build` in directory with the files
 4.  Open the solution generated in the build folder
-5.  Change the start-up project from ALL-BUILD to 
+5.  Change the start-up project from ALL-BUILD to Level_Renderer_Vulkan
 
 ## Tech
 This project was made using the following technologies:
